@@ -1,0 +1,47 @@
+﻿# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# Virtual environments
+.venv/
+venv/
+env/
+ENV/
+
+# Jupyter
+.ipynb_checkpoints/
+
+# Secrets and local config
+.env
+*.env
+.env.local
+
+# Local backup files created during iteration
+*.bak
+*.bak_*
+*.bak_before_*
+
+# OS/editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Runtime temp/cache folders
+medsec_sandbox/tmp/
+medsec_sandbox/crypto/
+medsec_sandbox/quarantine/
+medsec_sandbox/**/*.log
+
+# Large generated model/vector artifacts; rebuild from knowledge_base/documents when needed
+knowledge_base/vector_store/
+*.faiss
+*.pkl
+
+# Keep generated reports if you intentionally include sample output in the repo.
+# medsec_sandbox/reports/
+# medsec_sandbox/output/

@@ -1,0 +1,18 @@
+{
+  "summary": "\n        The Med-Sec Audit Agent completed a comprehensive security audit of the\n        Healthcare Clinical Documentation System. The audit identified a\n        CRITICAL risk level with 4 threats detected.\n\n        HIPAA compliance score: 66.7%.\n        \u26a0\ufe0f The system requires remediation to meet HIPAA standards.\n        ",
+  "highlights": [
+    "\u2705 2 vulnerabilities automatically remediated",
+    "\ud83d\udd0d 4 threats detected and logged"
+  ],
+  "critical_findings": [
+    "\u26a0\ufe0f Abnormal access frequency detected",
+    "\u26a0\ufe0f Suspicious users detected: {'unknown_user', 'attacker'}",
+    "\u26a0\ufe0f Potential SQL injection attempt: ' OR '1'='1",
+    "\ud83d\udccb PHI detected in record: ['name']"
+  ],
+  "improvement_areas": [
+    "\ud83d\udd27 Implement stricter input validation",
+    "\ud83d\udd27 Enforce least privilege access",
+    "\ud83d\udd27 Enable MFA"
+  ]
+}

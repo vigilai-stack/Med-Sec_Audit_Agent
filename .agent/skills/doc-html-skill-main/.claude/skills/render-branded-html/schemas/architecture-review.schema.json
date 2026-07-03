@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/architecture-review.schema.json",
+  "title": "Architecture Review (overlay)",
+  "allOf": [{ "$ref": "review-artifact.schema.json" }],
+  "properties": {
+    "artifact_type": { "const": "architecture-review" },
+    "decisions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["title"],
+        "properties": {
+          "title": { "type": "string" },
+          "rationale": { "type": "string" },
+          "status": { "type": "string" },
+          "ref": { "type": "string", "description": "e.g. an ADR id" }
+        }
+      }
+    },
+    "constraints": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          { "type": "string" },
+          {
+            "type": "object",
+            "required": ["text"],
+            "additionalProperties": false,
+            "properties": {
+              "text": { "type": "string", "minLength": 1 },
+              "severity": { "type": "string", "enum": ["high", "medium", "low", "info"] }
+            }
+          }
+        ]
+      }
+    },
+    "interfaces": { "type": "array", "items": { "type": "string" } },
+    "deployment_context": { "type": "string" },
+    "alternatives": { "type": "array", "items": { "type": "string" } }
+  }
+}

@@ -1,0 +1,40 @@
+
+        graph TD
+            subgraph "Input Layer"
+                A[📥 User Request / Test Data]
+            end
+
+            subgraph "Pre-Processing (8 Checks)"
+                C1[✅ Check 1: Input Validation]
+                C2[✅ Check 2: PHI Detection & Masking]
+                C3[✅ Check 3: Schema Validation]
+                C4[✅ Check 4: Context Sanitization]
+            end
+
+            subgraph "Runtime (8 Checks)"
+                C5[✅ Check 5: Ground Truth Verification]
+                C6[✅ Check 6: Baseline Comparison]
+                C7[✅ Check 7: Fix Verification]
+            end
+
+            subgraph "Post-Processing (8 Checks)"
+                C8[✅ Check 8: Regulatory Validation]
+            end
+
+            subgraph "Output"
+                O[📊 PHI Clean → Return to User]
+            end
+
+            A --> C1 --> C2 --> C3 --> C4
+            C4 --> C5 --> C6 --> C7 --> C8
+            C8 --> O
+
+            style C1 fill:#4CAF50,stroke:#2E7D32,color:white
+            style C2 fill:#4CAF50,stroke:#2E7D32,color:white
+            style C3 fill:#4CAF50,stroke:#2E7D32,color:white
+            style C4 fill:#4CAF50,stroke:#2E7D32,color:white
+            style C5 fill:#2196F3,stroke:#0D47A1,color:white
+            style C6 fill:#2196F3,stroke:#0D47A1,color:white
+            style C7 fill:#2196F3,stroke:#0D47A1,color:white
+            style C8 fill:#FF9800,stroke:#E65100,color:white
+        

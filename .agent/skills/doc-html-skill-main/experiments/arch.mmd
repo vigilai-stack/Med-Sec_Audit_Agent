@@ -1,0 +1,22 @@
+flowchart LR
+  subgraph Client["AI client"]
+    A[Claude · Cline · VS Code]
+  end
+  subgraph Server["rf-mcp · FastMCP server"]
+    B[MCP tools and prompts]
+    C[ExecutionCoordinator]
+  end
+  subgraph Backends["Execution backends"]
+    D[Native in-process RF context]
+    E[Attach bridge to live RF]
+    F[Suite run via robot CLI]
+  end
+  G[Robot Framework 7.x]
+  A -->|MCP · STDIO or HTTP| B
+  B --> C
+  C --> D
+  C --> E
+  C --> F
+  D --> G
+  E --> G
+  F --> G

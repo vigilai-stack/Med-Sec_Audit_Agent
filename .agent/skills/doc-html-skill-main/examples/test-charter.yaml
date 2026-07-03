@@ -1,0 +1,80 @@
+schema_version: 2
+artifact_type: test-charter
+title: Checkout Exploratory Test Charter
+subtitle: Session-based exploration of the payment path
+audience:
+- QA
+status: draft
+owner: QA Lead
+updated_at: '2026-05-30'
+missions:
+- Explore checkout failure handling when the PSP is slow or errors.
+- Explore saved-card selection and removal edge cases.
+heuristics:
+- 'CRUD: create, read, update, delete saved cards'
+- 'Goldilocks: too few, too many, just-right card lists'
+- 'Interruptions: network drop mid-authorize'
+coverage_boundaries:
+- 'In: card auth, retries, saved cards'
+- 'Out: subscription billing, partial refunds'
+exit_criteria:
+- All high-severity findings logged with repro steps.
+- Timebox of two 90-minute sessions reached.
+summary:
+- Focus is failure handling and saved-card edge cases.
+- Timeboxed to two sessions.
+sections:
+- id: mission
+  title: Charter mission
+  kind: prose
+  body: |
+    Investigate how checkout behaves under PSP latency and errors, and how saved-card management handles boundary conditions.
+- id: states
+  title: Payment states explored
+  kind: mermaid
+  diagram_type: state
+  source: |
+    stateDiagram-v2
+      [*] --> Authorizing
+      Authorizing --> Authorized
+      Authorizing --> Failed
+      Failed --> Retrying
+      Retrying --> Authorized
+      Retrying --> Abandoned
+      Authorized --> [*]
+- id: coverage
+  title: Coverage boundaries
+  kind: table
+  columns:
+  - area
+  - in_scope
+  - notes
+  rows:
+  - - Card authorization
+    - 'yes'
+    - Primary focus
+  - - Saved cards
+    - 'yes'
+    - Edge cases
+  - - Subscription billing
+    - 'no'
+    - Separate charter
+- id: coverage
+  title: Coverage confidence
+  kind: meters
+  items:
+  - label: Card auth happy path
+    value: 90
+    note: high
+  - label: PSP failure handling
+    value: 55
+    note: sessions planned
+  - label: Saved-card edge cases
+    value: 40
+    note: sessions planned
+  - label: Interrupt / resume
+    value: 20
+    note: out of timebox
+export:
+  pdf: false
+  freeze_diagrams: false

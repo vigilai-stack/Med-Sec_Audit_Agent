@@ -1,0 +1,30 @@
+
+        graph LR
+            subgraph "Phase 1: Baseline"
+                B[📊 Blue Team<br/>Establish Baseline]
+            end
+
+            subgraph "Phase 2: Red Team"
+                R[🔴 Red Team<br/>Attack Simulation]
+            end
+
+            subgraph "Phase 3: Blue Team"
+                D[🔵 Blue Team<br/>Threat Detection]
+            end
+
+            subgraph "Phase 4: Green Team"
+                G[🟢 Green Team<br/>Auto-Remediation]
+            end
+
+            subgraph "Phase 5: Compliance"
+                C[📋 Compliance<br/>HIPAA Validation]
+            end
+
+            B --> R --> D --> G --> C
+
+            style B fill:#42A5F5,stroke:#0D47A1,color:white
+            style R fill:#EF5350,stroke:#B71C1C,color:white
+            style D fill:#42A5F5,stroke:#0D47A1,color:white
+            style G fill:#66BB6A,stroke:#1B5E20,color:white
+            style C fill:#FFA726,stroke:#E65100,color:white
+        

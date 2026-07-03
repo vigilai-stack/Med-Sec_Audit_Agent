@@ -1,0 +1,79 @@
+{# skins/brief.html.j2 — executive dashboard brief.
+   Gradient hero + bento card grid; honors per-section width hints.
+   Default skin for risk-analysis. #}
+{% import "widgets.html.j2" as w %}
+<!doctype html>
+<html lang="en"{% if artifact.theme and artifact.theme.mode %} data-theme-mode="{{ artifact.theme.mode }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <title>{{ artifact.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+{{ theme_vars_css | safe }}
+{{ base_css | safe }}
+{{ skin_css | safe }}
+@media print {
+{{ print_css | safe }}
+}
+  </style>
+</head>
+<body class="skin-brief">
+  <div class="wrap">
+    <header class="hero">
+      <p class="eyebrow">◆ {{ artifact.artifact_type | replace("-", " ") }}</p>
+      <h1>{{ artifact.title }}</h1>
+      {% if artifact.subtitle %}<p class="lead">{{ artifact.subtitle }}</p>{% endif %}
+      <div class="chips">
+        {% if artifact.status %}<span class="chip"><b>Status</b> · {{ artifact.status }}</span>{% endif %}
+        {% if artifact.owner %}<span class="chip"><b>Owner</b> · {{ artifact.owner }}</span>{% endif %}
+        {% if artifact.updated_at %}<span class="chip"><b>Updated</b> · {{ artifact.updated_at }}</span>{% endif %}
+        {% for a in artifact.audience or [] %}<span class="chip">{{ a }}</span>{% endfor %}
+      </div>
+    </header>
+
+    <div class="bento">
+      {% if artifact.summary %}
+      <section class="bcard span-12 summary" aria-label="Executive summary">
+        <h2>Summary</h2>
+        <ul class="checklist">
+          {% for point in artifact.summary %}
+          <li><span class="tick" aria-hidden="true">✓</span><span>{{ point }}</span></li>
+          {% endfor %}
+        </ul>
+      </section>
+      {% endif %}
+
+      {% for section in sections %}
+      {# mermaid and wide tables cannot shrink — force full width #}
+      {% set half = section.width == "half" and section.kind not in ("mermaid",) %}
+      <section id="{{ section.id }}" class="bcard {{ 'span-6' if half else 'span-12' }} section--{{ section.kind }}">
+        <h2>{{ section.title }}</h2>
+        {{ w.body(section, frozen, frozen_svgs) }}
+      </section>
+      {% endfor %}
+
+      {% if artifact.evidence %}
+      <section id="evidence" class="bcard span-12 evidence" aria-label="Evidence">
+        <h2>Evidence</h2>
+        <div class="ev-chips">
+          {% for item in artifact.evidence %}
+          <a href="{{ item.href }}">↗ {{ item.label }}</a>
+          {% endfor %}
+        </div>
+      </section>
+      {% endif %}
+    </div>
+
+    {{ w.footer(artifact) }}
+  </div>
+
+  {% if not frozen %}
+  <script type="module">
+{{ mermaid_init | safe }}
+  </script>
+  {% endif %}
+  <script>
+{{ enhance_js | safe }}
+  </script>
+</body>
+</html>

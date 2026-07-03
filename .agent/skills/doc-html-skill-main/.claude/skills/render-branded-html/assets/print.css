@@ -1,0 +1,73 @@
+/*
+ * print.css — paged-media overrides. Injected by every skin template inside
+ * an `@media print { ... }` block, so one rendered HTML both displays and
+ * prints correctly. No widget content may be hidden on paper: tabs stack with
+ * their labels, details are expanded (enhance.js opens them on beforeprint;
+ * the display overrides below are the no-JS fallback), zoom/copy controls hide.
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm;
+}
+
+:root {
+  /* Print on white regardless of theme for legibility and ink cost. */
+  --color-bg: #FFFFFF;
+  --color-surface: #FFFFFF;
+}
+
+html, body {
+  background: #FFFFFF !important;
+  font-size: 12.5pt;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+/* chrome that makes no sense on paper */
+.topbar, .toc, .fig-zoom-btn, .fig-zoom-toggle, .copy-btn { display: none !important; }
+
+/* collapse app shells to a single printable column */
+.shell, .wrap, .page { display: block; max-width: 100%; padding: 0; }
+.content { max-width: 100%; padding: 0; }
+.bento { display: block; }
+.bcard { box-shadow: none; border: 1px solid var(--color-line); margin-bottom: 14px; }
+
+/* keep blocks intact across pages */
+.section, .figure, .table-wrap, .callout, .card-item, .codeblock,
+.summary, .evidence, .stat, .heatmap-wrap { break-inside: avoid; }
+.section h2, .sec-head, .hero h1 { break-after: avoid; }
+
+/* hero: flatten gradients for ink */
+.hero { background: #FFFFFF !important; color: var(--color-text) !important; border: 1px solid var(--color-line); border-radius: 0; padding: 0 0 14px; margin-bottom: 18px; box-shadow: none; }
+.hero::after { display: none; }
+.hero .lead { color: var(--color-text-dim) !important; }
+.hero .chip { border-color: var(--color-line); color: var(--color-text); background: transparent; }
+.hero .eyebrow { background: transparent; border: 0; color: var(--color-primary-strong); padding: 0; }
+
+/* tabs: show every pane, labelled */
+.tab-bar { display: none !important; }
+.tab-pane { display: block !important; border-top: 1px solid var(--color-line); }
+.tab-pane::before {
+  content: attr(data-label);
+  display: block;
+  font-weight: 700;
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--color-text-dim);
+  margin-bottom: 6px;
+}
+
+/* details: expanded (JS opens them; this is the no-JS fallback) */
+.details summary { list-style: none; }
+.details .details-body { display: block !important; }
+
+/* figures print at full width, never in the fixed overlay */
+.fig-zoom-toggle:checked + .fig-frame { position: static; padding: 16px; }
+.fig-stage { overflow: visible; }
+.fig-stage svg { max-width: 100% !important; min-width: 0 !important; }
+
+a { color: var(--color-primary-strong); text-decoration: none; }
+
+.doc-footer, .colophon { break-before: avoid; }

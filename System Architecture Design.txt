@@ -1,0 +1,220 @@
+
+🏥 MED-SEC AUDIT AGENT
+(AI-Powered Healthcare Data Security & Compliance Multi-Agent Auditor)
+Anomaly Detection in EHR Access Logs | Red/Blue/Green Team Architecture for HIPAA Compliance
+
+Team: PHI Guardians
+Members: Sangeeta Sinha & Chittranjan Garg
+Track: Agents for Good
+Submission Date: July 2026
+Kaggle Competition: AI Agents: Intensive Vibe Coding Capstone Project
+📋 Table of Contents
+
+    Project Overview
+    Problem Statement
+    Solution Architecture
+    Setup & Configuration
+    Flowchart Rendering
+    Security Utilities
+    MCP Server Implementation
+    Agent Architecture
+        8.1 Base Agent Class
+        8.2 Red Team Agent (Adversarial Testing)
+        8.3 Blue Team Agent (Threat Detection)
+        8.4 Green Team Agent (Auto-Remediation)
+        8.5 Compliance Agent (HIPAA Validation)
+    Orchestrator Supervisor
+    Patient Data Loader (Real Data)
+    Attack Payload Generator
+    Visualization & Reporting
+    Full Audit Execution
+    Results & Analysis
+    Report Generation Agent
+        15.1 Report Agent Implementation
+        15.2 Generate Audit Report
+    Robustness Tester
+    Anti-Hallucination Protocol
+    Run Robustness Tests
+    Export for Kaggle Submission
+    Conclusion
+    References
+
+1. Project Overview
+What is Med-Sec Audit Agent?
+
+The Med-Sec Audit Agent is a multi-agent system that autonomously audits healthcare AI systems for security vulnerabilities and HIPAA compliance. It . It performs anomaly detection in EHR access logs using a Red/Blue/Green team architecture with MCP-based secure tooling:
+
+    🔴 Detect PHI exposure through adversarial testing
+    🔵 Identify security threats in real-time
+    🟢 Apply auto-remediation to fix vulnerabilities
+    📋 Validate HIPAA/HITECH compliance
+
+Why This Matters
+Metric 	Value
+Healthcare breaches 	45% of organizations experienced a breach in 2025
+Average breach cost 	10.1M(highestofanyindustry)||∗∗HIPAAfines∗∗|Upto50,000 per violation
+AI systems without testing 	37% lack proper security testing
+Course Concepts Applied
+Concept 	Implementation 	Day
+Multi-agent System 	5 specialized agents with supervisor 	Day 1
+MCP Server 	Secure sandbox with healthcare tools 	Day 2
+Agent Skills 	Healthcare security skills library 	Day 3
+Security Features 	Sandboxing, encryption, audit logs 	Day 4
+Deployability 	Kaggle-ready, containerized 	Day 5
+2. Problem Statement
+The Healthcare Data Security Crisis
+
+Healthcare organizations are deploying AI agents faster than they can secure them. The data security challenges are compounded by:
+
+    Reactive – Detect breaches after they happen
+    Generic – Not designed for healthcare-specific threats
+    Manual – Require expert security analysts who are in short supply
+
+The Anomaly Detection Gap
+
+EHR access logs contain critical security signals, but traditional monitoring tools cannot detect:
+
+-🔴 Anomalous access patterns (unusual user behavior) -🔴 PHI exfiltration attempts (data theft) -🔴 Prompt injection attacks (AI-specific threats) -🔴 Privilege escalation (unauthorized access)
+Why This Matters
+Metric 	Value
+Healthcare data breaches 	45% of organizations experienced a breach in 2025
+Average breach cost 	10.1M(highestofanyindustry)||HIPAAfines|Upto50,000 per violation
+AI systems without data security testing 	37% lack proper security testing
+Our Solution
+
+The Med-Sec Audit Agent provides proactive, automated, healthcare-specific security auditing with:
+
+    Zero-trust architecture – No implicit trust, continuous verification
+    PHI-aware – Detects and masks protected health information
+    Self-healing – Auto-remediates vulnerabilities
+    Compliance-ready – HIPAA/HITECH validation built-in
+
+Key Innovation: Red/Blue/Green Team Pattern
+
+This is the first healthcare data security agent to use the Red/Blue/Green team pattern adapted from cybersecurity:
+
+    🔴 Red Team = Attackers (find data vulnerabilities)
+    🔵 Blue Team = Defenders (monitor data threats)
+    🟢 Green Team = Fixers (auto-remediate data risks)
+
+This pattern ensures continuous security validation rather than one-time testing.
+3. Solution Architecture
+### System Architecture Diagram
+
+┌──────────────────────────────────────────────────────────────────────────────────┐
+│                             USER LAYER                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │                                                                          │    │
+│  │                    👤 Developer / User                                   │    │    
+│  │                     (Initiates Security Audit)                           │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                           │
+│                                      ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │                        ORCHESTRATOR SUPERVISOR                           │    │
+│  │                    (Control Loop & State management)                     │    │                                │  │                                                                          │    │
+│  │                                                                          │    │
+│  │  ┌────────────────────────────────────────────────────────────────────┐  │    │
+│  │  │  Phase 1: Baseline Establishment (Blue Team)                       │  │    │
+│  │  │  ├─> Analyze historical access logs                                │  │    │
+│  │  │  ├─> Identify normal user behavior patterns                        │  │    │
+│  │  │  └─> Establish baseline profile → Store in memory                  │  │    │
+│  │  ├────────────────────────────────────────────────────────────────────┤  │    │
+│  │  │  Phase 2: Adversarial Testing (Red Team)                           │  │    │
+│  │  │  ├─> PHI Exfiltration → Attempt to extract patient data            │  │    │
+│  │  │  ├─> Prompt Injection → Bypass system instructions                 │  │    │
+│  │  │  ├─> Privilege Escalation → Gain unauthorized access               │  │    │
+│  │  │  └─> Hallucination Trigger → Force false information               │  │    │
+│  │  ├────────────────────────────────────────────────────────────────────┤  │    │
+│  │  │  Phase 3: Real-time Monitoring (Blue Team)                         │  │    │
+│  │  │  ├─> Activity analysis → Scan EHR access logs                      │  │    │
+│  │  │  ├─> Anomaly detection → Compare against baseline                  │  │    │
+│  │  │  ├─> Threat identification → Flag suspicious patterns              │  │    │
+│  │  │  └─> Risk scoring → Assign severity level (LOW/MEDIUM/HIGH)        │  │    │
+│  │  ├────────────────────────────────────────────────────────────────────┤  │    │
+│  │  │  Phase 4: Auto-Remediation (Green Team)                            │  │    │
+│  │  │  ├─> Vulnerability assessment → Classify threat type               │  │    │
+│  │  │  ├─> Patch application → Apply security fix                        │  │    │
+│  │  │  ├─> Code refactoring → Rewrite vulnerable code                    │  │    │
+│  │  │  └─> Fix verification → Validate patch success                     │  │    │
+│  │  ├────────────────────────────────────────────────────────────────────┤  │    │
+│  │  │  Phase 5: Compliance Verification (Compliance Agent)               │  │    │
+│  │  │  ├─> HIPAA control checking → Validate privacy & security rules    │  │    │
+│  │  │  ├─> PHI detection → Scan for protected health information         │  │    │
+│  │  │  ├─> Audit trail review → Verify logging completeness              │  │    │
+│  │  │  └─> Score reporting → Generate compliance score (0-100%)          │  │    │
+│  │  └────────────────────────────────────────────────────────────────────┘  │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                           │
+│                                      ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │                           MCP SERVER (SANDBOX)                           │    │
+│  │                    (Secure Tool Execution Environment)                   │    │
+│  │                                                                          │    │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────────────┐ │    │
+│  │  │ Tool 1:       │  │ Tool 2:       │  │ Tool 3:                       │ │    │
+│  │  │ Anonymize PHI │  │ Detect Threat │  │ Compliance Check              │ │    │
+│  │  │               │  │               │  │                               │ │    │
+│  │  │ • Mask names  │  │ • SQL         │  │ • Validate HIPAA              │ │    │
+│  │  │ • Mask SSN    │  │   injection   │  │   Privacy Rule                │ │    │
+│  │  │ • Mask DOB    │  │ • PHI access  │  │ • Validate HIPAA              │ │    │
+│  │  │ • Mask Phone  │  │   patterns    │  │   Security Rule               │ │    │
+│  │  │ • Mask Email  │  │ • Off-hours   │  │ • Validate Breach             │ │    │
+│  │  │ • Mask MRN    │  │   activity    │  │   Notification                │ │    │
+│  │  │ • Mask Address│  │ • Anomalous   │  │ • Check encryption            │ │    │
+│  │  │               │  │   users       │  │ • Check audit logging         │ │    │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────────────┘ │    │
+│  │                                                                          │    │
+│  │  Security Controls:                                                      │    │
+│  │  • Ephemeral sandbox → Fresh per run                                     │    │
+│  │  • Timeout protection → 5-second limit                                   │    │
+│  │  • Read-only by default → No data modification                           │    │
+│  │  • Audit logging → Every action tracked                                  │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                           │
+│                                      ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │                          DATA & KNOWLEDGE LAYER                          │    │
+│  │                                                                          │    │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────────────┐ │    │
+│  │  │ Patient Data  │  │ Attack        │  │ RAG Knowledge Base            │ │    │
+│  │  │ (EHR Records) │  │ Payloads      │  │ (Regulatory Documents)        │ │    │
+│  │  │               │  │               │  │                               │ │    │
+│  │  │ • MRN         │  │ • PHI         │  │ • HIPAA Privacy Rule          │ │    │
+│  │  │ • Name        │  │   Exfiltration│  │ • HIPAA Security Rule         │ │    │
+│  │  │ • DOB         │  │ • Prompt      │  │ • NIST CSF 2.0                │ │    │
+│  │  │ • SSN         │  │   Injection   │  │ • FDA 21 CFR Part 11          │ │    │
+│  │  │ • Phone       │  │ • Privilege   │  │ • Clinical Guidelines         │ │    │
+│  │  │ • Email       │  │   Escalation  │  │ • Internal Policies           │ │    │
+│  │  │ • Address     │  │ • SQL         │  │ • Medical Knowledge           │ │    │
+│  │  │ • Conditions  │  │   Injection   │  │                               │ │    │
+│  │  │ • Medications │  │ • Path        │  │                               │ │    │
+│  │  │ • Allergies   │  │   Traversal   │  │                               │ │    │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────────────┘ │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                           │
+│                                      ▼                                           │
+│  ┌──────────────────────────────────────────────────────────────────────────┐    │
+│  │                          OUTPUT LAYER                                    │    │
+│  │                                                                          │    │
+│  │  ┌───────────────┐  ┌───────────────┐  ┌───────────────────────────────┐ │    │
+│  │  │ Audit Report  │  │ Visualiza-    │  │ Export Formats                │ │    │
+│  │  │               │  │ tions         │  │                               │ │    │
+│  │  │ • Risk        │  │ • Compliance  │  │ • JSON                        │ │    │
+│  │  │   Assessment  │  │   Dashboard   │  │ • CSV                         │ │    │
+│  │  │ • Threat List │  │ • Risk Level  │  │ • HTML                        │ │    │
+│  │  │ • Remediation │  │   Chart       │  │ • DOCX                        │ │    │
+│  │  │ • Compliance  │  │ • Attack      │  │ • PDF                         │ │    │
+│  │  │   Score       │  │   Success     │  │ • Markdown                    │ │    │
+│  │  │ • Recommen-   │  │ • Anti-       │  │                               │ │    │
+│  │  │   dations     │  │   Hallucina-  │  │                               │ │    │
+│  │  │               │  │   tion        │  │                               │ │    │
+│  │  │               │  │   Flowchart   │  │                               │ │    │
+│  │  └───────────────┘  └───────────────┘  └───────────────────────────────┘ │    │
+│  └──────────────────────────────────────────────────────────────────────────┘    │
+│                                      │                                           │
+│                                      ▼                                           │
+│                     ✅ RETURN TO USER (Audit Complete)                           │             
+│                                                                                  │
+│                                                                                  │
+└──────────────────────────────────────────────────────────────────────────────────┘

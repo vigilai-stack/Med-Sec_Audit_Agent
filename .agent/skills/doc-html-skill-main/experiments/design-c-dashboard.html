@@ -1,0 +1,224 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>rf-mcp — Architecture Review (Design C: Dashboard brief)</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+:root{
+  --bg:#F1F4F9; --surface:#FFFFFF; --ink:#101828; --ink-dim:#5D6B82;
+  --line:#E3E8F0;
+  --primary:#4F46E5; --primary-2:#7C3AED; --primary-soft:#EEF0FE; --primary-ink:#4338CA;
+  --teal:#0D9488; --teal-soft:#F0FDFA;
+  --amber:#D97706; --amber-soft:#FFFBEB;
+  --rose:#E11D48; --rose-soft:#FFF1F2;
+  --sans:"Inter",-apple-system,"Segoe UI",Arial,sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+  --r:16px; --r-sm:10px;
+  --shadow:0 1px 2px rgba(16,24,40,.04),0 4px 16px -4px rgba(16,24,40,.08);
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--ink);font-family:var(--sans);line-height:1.6;font-size:15.5px}
+img,svg{max-width:100%;height:auto}
+.wrap{max-width:1080px;margin:0 auto;padding:28px 24px 96px}
+
+/* ── hero banner ─────────────────────────────── */
+.hero{position:relative;overflow:hidden;border-radius:20px;padding:44px 44px 40px;color:#fff;background:linear-gradient(120deg,#312E81 0%,var(--primary) 55%,var(--primary-2) 100%);box-shadow:var(--shadow);margin-bottom:20px}
+.hero::after{content:"";position:absolute;right:-120px;top:-120px;width:380px;height:380px;border-radius:50%;background:radial-gradient(circle,rgba(255,255,255,.14),transparent 70%)}
+.hero .eyebrow{margin:0 0 10px;display:inline-flex;align-items:center;gap:8px;background:rgba(255,255,255,.14);border:1px solid rgba(255,255,255,.25);padding:4px 14px;border-radius:999px;font-size:.74rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase}
+.hero h1{margin:0 0 8px;font-size:2.6rem;letter-spacing:-.02em;line-height:1.1}
+.hero .lead{margin:0 0 20px;font-size:1.15rem;color:rgba(255,255,255,.85);max-width:58ch}
+.hero .chips{display:flex;flex-wrap:wrap;gap:8px;position:relative}
+.chip{background:rgba(255,255,255,.13);border:1px solid rgba(255,255,255,.22);padding:4px 12px;border-radius:999px;font-size:.78rem;font-weight:500}
+.chip b{font-weight:700}
+
+/* ── KPI row ─────────────────────────────────── */
+.kpis{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:14px;margin-bottom:20px}
+.kpi{background:var(--surface);border-radius:var(--r);padding:18px 20px;box-shadow:var(--shadow);display:flex;gap:14px;align-items:center}
+.kpi .ic{flex:none;width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:1.15rem}
+.kpi:nth-child(1) .ic{background:var(--primary-soft);color:var(--primary-ink)}
+.kpi:nth-child(2) .ic{background:var(--teal-soft);color:var(--teal)}
+.kpi:nth-child(3) .ic{background:var(--amber-soft);color:var(--amber)}
+.kpi:nth-child(4) .ic{background:var(--rose-soft);color:var(--rose)}
+.kpi .n{font-size:1.55rem;font-weight:800;letter-spacing:-.02em;line-height:1.1}
+.kpi .l{font-size:.78rem;color:var(--ink-dim)}
+
+/* ── bento grid ──────────────────────────────── */
+.bento{display:grid;grid-template-columns:repeat(12,1fr);gap:14px}
+.card{background:var(--surface);border-radius:var(--r);padding:24px;box-shadow:var(--shadow);min-width:0}
+.span-12{grid-column:span 12}.span-8{grid-column:span 8}.span-7{grid-column:span 7}.span-6{grid-column:span 6}.span-5{grid-column:span 5}.span-4{grid-column:span 4}
+@media(max-width:860px){.span-8,.span-7,.span-6,.span-5,.span-4{grid-column:span 12}}
+.card h2{margin:0 0 4px;font-size:1.15rem;letter-spacing:-.01em;display:flex;align-items:center;gap:10px}
+.card h2 .glyph{width:28px;height:28px;border-radius:8px;background:var(--primary-soft);color:var(--primary-ink);display:grid;place-items:center;font-size:.9rem;flex:none}
+.card .sub{margin:0 0 14px;font-size:.83rem;color:var(--ink-dim)}
+
+/* ── summary card ───────────────────────────── */
+.summary li{margin-bottom:9px}
+.summary ul{margin:8px 0 0;padding-left:20px}
+.summary li::marker{color:var(--primary)}
+
+/* ── decision tiles ─────────────────────────── */
+.dec-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:14px}
+@media(max-width:680px){.dec-grid{grid-template-columns:1fr}}
+.dec{border:1px solid var(--line);border-radius:var(--r-sm);padding:14px 16px;background:linear-gradient(180deg,#FBFCFF, #FFF)}
+.dec .head{display:flex;justify-content:space-between;gap:10px;align-items:start}
+.dec h3{margin:0;font-size:.92rem;line-height:1.4}
+.dec .tag{flex:none;font-size:.65rem;font-weight:700;text-transform:uppercase;letter-spacing:.05em;padding:3px 8px;border-radius:6px;background:var(--teal-soft);color:var(--teal)}
+.dec p{margin:7px 0 0;font-size:.83rem;color:var(--ink-dim)}
+
+/* ── severity / constraint list ─────────────── */
+.constraint{display:flex;gap:12px;padding:11px 0;border-bottom:1px solid var(--line);font-size:.88rem;align-items:start}
+.constraint:last-child{border-bottom:0}
+.sev{flex:none;margin-top:3px;font-size:.62rem;font-weight:800;text-transform:uppercase;letter-spacing:.06em;padding:2px 8px;border-radius:6px}
+.sev--high{background:var(--rose-soft);color:var(--rose)}
+.sev--med{background:var(--amber-soft);color:var(--amber)}
+.sev--info{background:var(--primary-soft);color:var(--primary-ink)}
+
+/* ── meter rows ─────────────────────────────── */
+.meter-row{margin-bottom:14px}
+.meter-row .top{display:flex;justify-content:space-between;font-size:.82rem;margin-bottom:5px}
+.meter-row .top b{font-weight:600}
+.meter-row .top span{color:var(--ink-dim)}
+.meter{height:8px;border-radius:99px;background:#EDF0F7;overflow:hidden}
+.meter i{display:block;height:100%;border-radius:99px;background:linear-gradient(90deg,var(--primary),var(--primary-2))}
+
+/* ── diagram card ───────────────────────────── */
+.diagram{text-align:center;padding:10px 6px 0}
+.figcap{margin-top:10px;font-size:.78rem;color:var(--ink-dim)}
+.figcap b{color:var(--ink)}
+
+/* ── table card ─────────────────────────────── */
+.table-wrap{overflow-x:auto}
+table{width:100%;border-collapse:separate;border-spacing:0;font-size:.86rem}
+th{text-align:left;font-size:.7rem;text-transform:uppercase;letter-spacing:.07em;color:var(--ink-dim);padding:8px 12px;border-bottom:1px solid var(--line)}
+td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top}
+tbody tr:last-child td{border-bottom:0}
+tbody tr:nth-child(odd){background:#FAFBFE}
+td:first-child{font-weight:600}
+code{font-family:var(--mono);font-size:.8em;background:var(--primary-soft);color:var(--primary-ink);padding:1.5px 6px;border-radius:5px}
+
+/* ── timeline flow ──────────────────────────── */
+.flow{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:14px}
+@media(max-width:760px){.flow{grid-template-columns:1fr 1fr}}
+.flow .step{position:relative;border:1px solid var(--line);border-radius:var(--r-sm);padding:14px;background:#FBFCFF}
+.flow .step .num{position:absolute;top:-11px;left:12px;background:var(--primary);color:#fff;font-size:.7rem;font-weight:800;width:22px;height:22px;border-radius:50%;display:grid;place-items:center;box-shadow:0 0 0 4px var(--surface)}
+.flow .step b{display:block;font-size:.84rem;margin:4px 0 4px}
+.flow .step p{margin:0;font-size:.76rem;color:var(--ink-dim)}
+
+/* ── evidence + footer ──────────────────────── */
+.evidence a{display:inline-flex;align-items:center;gap:6px;background:var(--primary-soft);color:var(--primary-ink);font-weight:600;font-size:.8rem;text-decoration:none;padding:6px 14px;border-radius:999px;margin:0 8px 8px 0}
+footer{margin-top:28px;text-align:center;color:var(--ink-dim);font-size:.8rem}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="hero">
+    <p class="eyebrow">◆ Architecture review</p>
+    <h1>rf-mcp</h1>
+    <p class="lead">Where AI agents meet Robot Framework. Describe a test in plain words, get a working <b>.robot</b> suite back — validated live, not guessed.</p>
+    <div class="chips">
+      <span class="chip"><b>Status</b> · draft</span>
+      <span class="chip"><b>Owner</b> · RobotMCP</span>
+      <span class="chip"><b>Updated</b> · 2026-05-30</span>
+      <span class="chip">Test &amp; automation engineers</span>
+      <span class="chip">QA professionals</span>
+    </div>
+  </header>
+
+  <div class="kpis">
+    <div class="kpi"><div class="ic">⚙︎</div><div><div class="n">3</div><div class="l">Execution backends</div></div></div>
+    <div class="kpi"><div class="ic">🧰</div><div><div class="n">10+</div><div class="l">MCP tools</div></div></div>
+    <div class="kpi"><div class="ic">🤖</div><div><div class="n">7.0+</div><div class="l">Robot Framework</div></div></div>
+    <div class="kpi"><div class="ic">⇄</div><div><div class="n">2</div><div class="l">Transports — STDIO · HTTP</div></div></div>
+  </div>
+
+  <div class="bento">
+
+    <div class="card span-7 summary">
+      <h2><span class="glyph">☰</span>Summary</h2>
+      <ul>
+        <li>rf-mcp is the handshake between your AI agent and Robot Framework. Plain words in, a working <code>.robot</code> suite out.</li>
+        <li>It does not guess — keywords run in a live RF context, step by step, with real feedback before a single line is written down.</li>
+        <li>Three execution backends, because one size never fits all.</li>
+        <li>Built on FastMCP and RF 7, with small-LLM optimizations so lighter models keep up.</li>
+      </ul>
+    </div>
+
+    <div class="card span-5">
+      <h2><span class="glyph">⚠</span>Constraints</h2>
+      <p class="sub">What you sign up for</p>
+      <div class="constraint"><span class="sev sev--high">High</span><span>MCP STDIO shares one JSON-RPC channel — RF console output is redirected and suppressed.</span></div>
+      <div class="constraint"><span class="sev sev--med">Med</span><span>Requires Robot Framework 7.0+ (RF 7.x running APIs).</span></div>
+      <div class="constraint"><span class="sev sev--med">Med</span><span>Attach bridge expects an <code>X-MCP-Token</code> header on <code>127.0.0.1:7317</code>.</span></div>
+      <div class="constraint"><span class="sev sev--info">Info</span><span>Browser / mobile / database features need the matching install extra.</span></div>
+    </div>
+
+    <div class="card span-12">
+      <h2><span class="glyph">⌗</span>How it fits together</h2>
+      <p class="sub">AI client → FastMCP server → three execution backends → Robot Framework 7.x</p>
+      <div class="diagram"><svg id="my-svg" width="100%" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" class="flowchart" style="max-width: 1682.61px; background-color: transparent;" viewBox="0 0 1682.609375 372" role="graphics-document document" aria-roledescription="flowchart-v2"><style>#my-svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;fill:#333;}@keyframes edge-animation-frame{from{stroke-dashoffset:0;}}@keyframes dash{to{stroke-dashoffset:0;}}#my-svg .edge-animation-slow{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 50s linear infinite;stroke-linecap:round;}#my-svg .edge-animation-fast{stroke-dasharray:9,5!important;stroke-dashoffset:900;animation:dash 20s linear infinite;stroke-linecap:round;}#my-svg .error-icon{fill:#552222;}#my-svg .error-text{fill:#552222;stroke:#552222;}#my-svg .edge-thickness-normal{stroke-width:1px;}#my-svg .edge-thickness-thick{stroke-width:3.5px;}#my-svg .edge-pattern-solid{stroke-dasharray:0;}#my-svg .edge-thickness-invisible{stroke-width:0;fill:none;}#my-svg .edge-pattern-dashed{stroke-dasharray:3;}#my-svg .edge-pattern-dotted{stroke-dasharray:2;}#my-svg .marker{fill:#333333;stroke:#333333;}#my-svg .marker.cross{stroke:#333333;}#my-svg svg{font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:16px;}#my-svg p{margin:0;}#my-svg .label{font-family:"trebuchet ms",verdana,arial,sans-serif;color:#333;}#my-svg .cluster-label text{fill:#333;}#my-svg .cluster-label span{color:#333;}#my-svg .cluster-label span p{background-color:transparent;}#my-svg .label text,#my-svg span{fill:#333;color:#333;}#my-svg .node rect,#my-svg .node circle,#my-svg .node ellipse,#my-svg .node polygon,#my-svg .node path{fill:#ECECFF;stroke:#9370DB;stroke-width:1px;}#my-svg .rough-node .label text,#my-svg .node .label text,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-anchor:middle;}#my-svg .node .katex path{fill:#000;stroke:#000;stroke-width:1px;}#my-svg .rough-node .label,#my-svg .node .label,#my-svg .image-shape .label,#my-svg .icon-shape .label{text-align:center;}#my-svg .node.clickable{cursor:pointer;}#my-svg .root .anchor path{fill:#333333!important;stroke-width:0;stroke:#333333;}#my-svg .arrowheadPath{fill:#333333;}#my-svg .edgePath .path{stroke:#333333;stroke-width:1px;}#my-svg .flowchart-link{stroke:#333333;fill:none;}#my-svg .edgeLabel{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .edgeLabel p{background-color:rgba(232,232,232, 0.8);}#my-svg .edgeLabel rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .labelBkg{background-color:rgba(232, 232, 232, 0.5);}#my-svg .cluster rect{fill:#ffffde;stroke:#aaaa33;stroke-width:1px;}#my-svg .cluster text{fill:#333;}#my-svg .cluster span{color:#333;}#my-svg div.mermaidTooltip{position:absolute;text-align:center;max-width:200px;padding:2px;font-family:"trebuchet ms",verdana,arial,sans-serif;font-size:12px;background:hsl(80, 100%, 96.2745098039%);border:1px solid #aaaa33;border-radius:2px;pointer-events:none;z-index:100;}#my-svg .flowchartTitleText{text-anchor:middle;font-size:18px;fill:#333;}#my-svg rect.text{fill:none;stroke-width:0;}#my-svg .icon-shape,#my-svg .image-shape{background-color:rgba(232,232,232, 0.8);text-align:center;}#my-svg .icon-shape p,#my-svg .image-shape p{background-color:rgba(232,232,232, 0.8);padding:2px;}#my-svg .icon-shape .label rect,#my-svg .image-shape .label rect{opacity:0.5;background-color:rgba(232,232,232, 0.8);fill:rgba(232,232,232, 0.8);}#my-svg .label-icon{display:inline-block;height:1em;overflow:visible;vertical-align:-0.125em;}#my-svg .node .label-icon path{fill:currentColor;stroke:revert;stroke-width:revert;}#my-svg .node .neo-node{stroke:#9370DB;}#my-svg [data-look="neo"].node rect,#my-svg [data-look="neo"].cluster rect,#my-svg [data-look="neo"].node polygon{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node path{stroke:#9370DB;stroke-width:1px;}#my-svg [data-look="neo"].node .outer-path{filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node .neo-line path{stroke:#9370DB;filter:none;}#my-svg [data-look="neo"].node circle{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].node circle .state-start{fill:#000000;}#my-svg [data-look="neo"].icon-shape .icon{fill:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg [data-look="neo"].icon-shape .icon-neo path{stroke:#9370DB;filter:drop-shadow(1px 2px 2px rgba(185, 185, 185, 1));}#my-svg :root{--mermaid-font-family:"trebuchet ms",verdana,arial,sans-serif;}</style><g><marker id="my-svg_flowchart-v2-pointEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 0 L 10 5 L 0 10 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="4.5" refY="5" markerUnits="userSpaceOnUse" markerWidth="8" markerHeight="8" orient="auto"><path d="M 0 5 L 10 10 L 10 0 z" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointEnd-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="11.5" refY="7" markerUnits="userSpaceOnUse" markerWidth="10.5" markerHeight="14" orient="auto"><path d="M 0 0 L 11.5 7 L 0 14 z" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-pointStart-margin" class="marker flowchart-v2" viewBox="0 0 11.5 14" refX="1" refY="7" markerUnits="userSpaceOnUse" markerWidth="11.5" markerHeight="14" orient="auto"><polygon points="0,7 11.5,14 11.5,0" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd" class="marker flowchart-v2" viewBox="0 0 10 10" refX="11" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-1" refY="5" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 1; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleEnd-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refY="5" refX="12.25" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-circleStart-margin" class="marker flowchart-v2" viewBox="0 0 10 10" refX="-2" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><circle cx="5" cy="5" r="5" class="arrowMarkerPath" style="stroke-width: 0; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="12" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossStart" class="marker cross flowchart-v2" viewBox="0 0 11 11" refX="-1" refY="5.2" markerUnits="userSpaceOnUse" markerWidth="11" markerHeight="11" orient="auto"><path d="M 1,1 l 9,9 M 10,1 l -9,9" class="arrowMarkerPath" style="stroke-width: 2; stroke-dasharray: 1, 0;"/></marker><marker id="my-svg_flowchart-v2-crossEnd-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="17.7" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5;"/></marker><marker id="my-svg_flowchart-v2-crossStart-margin" class="marker cross flowchart-v2" viewBox="0 0 15 15" refX="-3.5" refY="7.5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M 1,1 L 14,14 M 1,14 L 14,1" class="arrowMarkerPath" style="stroke-width: 2.5; stroke-dasharray: 1, 0;"/></marker><g class="root"><g class="clusters"><g class="cluster" id="my-svg-Backends" data-look="classic"><rect style="" x="1101.671875" y="8" width="310" height="356"/><g class="cluster-label" transform="translate(1185.0703125, 8)"><foreignObject width="143.203125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>Execution backends</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-Server" data-look="classic"><rect style="" x="510.90625" y="42" width="540.765625" height="280"/><g class="cluster-label" transform="translate(693.875, 42)"><foreignObject width="174.828125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>rf-mcp · FastMCP server</p></span></div></foreignObject></g></g><g class="cluster" id="my-svg-Client" data-look="classic"><rect style="" x="8" y="136" width="289.640625" height="124"/><g class="cluster-label" transform="translate(124.359375, 136)"><foreignObject width="56.921875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5;"><span class="nodeLabel"><p>AI client</p></span></div></foreignObject></g></g></g><g class="edgePaths"><path d="M272.641,198L276.807,198C280.974,198,289.307,198,311.246,198C333.185,198,368.729,198,404.273,198C439.818,198,475.362,198,496.634,198C517.906,198,524.906,198,528.406,198L531.906,198" id="my-svg-L_A_B_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_A_B_0" data-points="W3sieCI6MjcyLjY0MDYyNSwieSI6MTk4fSx7IngiOjI5Ny42NDA2MjUsInkiOjE5OH0seyJ4Ijo0MDQuMjczNDM3NSwieSI6MTk4fSx7IngiOjUxMC45MDYyNSwieSI6MTk4fSx7IngiOjUzNS45MDYyNSwieSI6MTk4fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M762.797,198L766.964,198C771.13,198,779.464,198,787.13,198C794.797,198,801.797,198,805.297,198L808.797,198" id="my-svg-L_B_C_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_B_C_0" data-points="W3sieCI6NzYyLjc5Njg3NSwieSI6MTk4fSx7IngiOjc4Ny43OTY4NzUsInkiOjE5OH0seyJ4Ijo4MTIuNzk2ODc1LCJ5IjoxOTh9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M950.444,171L967.315,156.167C984.187,141.333,1017.929,111.667,1038.967,96.833C1060.005,82,1068.339,82,1076.672,82C1085.005,82,1093.339,82,1101.005,82C1108.672,82,1115.672,82,1119.172,82L1122.672,82" id="my-svg-L_C_D_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_D_0" data-points="W3sieCI6OTUwLjQ0Mzk2NTUxNzI0MTQsInkiOjE3MX0seyJ4IjoxMDUxLjY3MTg3NSwieSI6ODJ9LHsieCI6MTA3Ni42NzE4NzUsInkiOjgyfSx7IngiOjExMDEuNjcxODc1LCJ5Ijo4Mn0seyJ4IjoxMTI2LjY3MTg3NSwieSI6ODJ9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1026.672,198L1030.839,198C1035.005,198,1043.339,198,1051.672,198C1060.005,198,1068.339,198,1076.672,198C1085.005,198,1093.339,198,1103.814,198C1114.289,198,1126.906,198,1133.215,198L1139.523,198" id="my-svg-L_C_E_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_E_0" data-points="W3sieCI6MTAyNi42NzE4NzUsInkiOjE5OH0seyJ4IjoxMDUxLjY3MTg3NSwieSI6MTk4fSx7IngiOjEwNzYuNjcxODc1LCJ5IjoxOTh9LHsieCI6MTEwMS42NzE4NzUsInkiOjE5OH0seyJ4IjoxMTQzLjUyMzQzNzUsInkiOjE5OH1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M953.987,225L970.268,237.833C986.549,250.667,1019.11,276.333,1039.558,289.167C1060.005,302,1068.339,302,1076.672,302C1085.005,302,1093.339,302,1104.405,302C1115.471,302,1129.271,302,1136.171,302L1143.07,302" id="my-svg-L_C_F_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_C_F_0" data-points="W3sieCI6OTUzLjk4NzM3OTgwNzY5MjMsInkiOjIyNX0seyJ4IjoxMDUxLjY3MTg3NSwieSI6MzAyfSx7IngiOjEwNzYuNjcxODc1LCJ5IjozMDJ9LHsieCI6MTEwMS42NzE4NzUsInkiOjMwMn0seyJ4IjoxMTQ3LjA3MDMxMjUsInkiOjMwMn1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1386.672,82L1390.839,82C1395.005,82,1403.339,82,1411.672,82C1420.005,82,1428.339,82,1448.817,96.392C1469.295,110.785,1501.918,139.569,1518.229,153.961L1534.541,168.354" id="my-svg-L_D_G_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_D_G_0" data-points="W3sieCI6MTM4Ni42NzE4NzUsInkiOjgyfSx7IngiOjE0MTEuNjcxODc1LCJ5Ijo4Mn0seyJ4IjoxNDM2LjY3MTg3NSwieSI6ODJ9LHsieCI6MTUzNy41NDAxNDAwODYyMDcsInkiOjE3MX1d" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1369.82,198L1376.796,198C1383.771,198,1397.721,198,1408.863,198C1420.005,198,1428.339,198,1436.005,198C1443.672,198,1450.672,198,1454.172,198L1457.672,198" id="my-svg-L_E_G_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_E_G_0" data-points="W3sieCI6MTM2OS44MjAzMTI1LCJ5IjoxOTh9LHsieCI6MTQxMS42NzE4NzUsInkiOjE5OH0seyJ4IjoxNDM2LjY3MTg3NSwieSI6MTk4fSx7IngiOjE0NjEuNjcxODc1LCJ5IjoxOTh9XQ==" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/><path d="M1366.273,302L1373.84,302C1381.406,302,1396.539,302,1408.272,302C1420.005,302,1428.339,302,1448.205,289.58C1468.072,277.161,1499.472,252.321,1515.172,239.901L1530.872,227.482" id="my-svg-L_F_G_0" class="edge-thickness-normal edge-pattern-solid edge-thickness-normal edge-pattern-solid flowchart-link" style=";" data-edge="true" data-et="edge" data-id="L_F_G_0" data-points="W3sieCI6MTM2Ni4yNzM0Mzc1LCJ5IjozMDJ9LHsieCI6MTQxMS42NzE4NzUsInkiOjMwMn0seyJ4IjoxNDM2LjY3MTg3NSwieSI6MzAyfSx7IngiOjE1MzQuMDA5MzE0OTAzODQ2MiwieSI6MjI1fV0=" data-look="classic" marker-end="url(#my-svg_flowchart-v2-pointEnd)"/></g><g class="edgeLabels"><g class="edgeLabel" transform="translate(404.2734375, 198)"><g class="label" data-id="L_A_B_0" transform="translate(-81.6328125, -12)"><foreignObject width="163.265625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"><p>MCP · STDIO or HTTP</p></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_B_C_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_D_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_E_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_C_F_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_D_G_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_E_G_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g><g class="edgeLabel"><g class="label" data-id="L_F_G_0" transform="translate(0, 0)"><foreignObject width="0" height="0"><div xmlns="http://www.w3.org/1999/xhtml" class="labelBkg" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="edgeLabel"></span></div></foreignObject></g></g></g><g class="nodes"><g class="node default" id="my-svg-flowchart-A-0" data-look="classic" transform="translate(152.8203125, 198)"><rect class="basic label-container" style="" x="-119.8203125" y="-27" width="239.640625" height="54"/><g class="label" style="" transform="translate(-89.8203125, -12)"><rect/><foreignObject width="179.640625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Claude · Cline · VS Code</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-B-1" data-look="classic" transform="translate(649.3515625, 198)"><rect class="basic label-container" style="" x="-113.4453125" y="-27" width="226.890625" height="54"/><g class="label" style="" transform="translate(-83.4453125, -12)"><rect/><foreignObject width="166.890625" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>MCP tools and prompts</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-C-2" data-look="classic" transform="translate(919.734375, 198)"><rect class="basic label-container" style="" x="-106.9375" y="-27" width="213.875" height="54"/><g class="label" style="" transform="translate(-76.9375, -12)"><rect/><foreignObject width="153.875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>ExecutionCoordinator</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-D-3" data-look="classic" transform="translate(1256.671875, 82)"><rect class="basic label-container" style="" x="-130" y="-39" width="260" height="78"/><g class="label" style="" transform="translate(-100, -24)"><rect/><foreignObject width="200" height="48"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table; white-space: break-spaces; line-height: 1.5; max-width: 200px; text-align: center; width: 200px;"><span class="nodeLabel"><p>Native in-process RF context</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-E-4" data-look="classic" transform="translate(1256.671875, 198)"><rect class="basic label-container" style="" x="-113.1484375" y="-27" width="226.296875" height="54"/><g class="label" style="" transform="translate(-83.1484375, -12)"><rect/><foreignObject width="166.296875" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Attach bridge to live RF</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-F-5" data-look="classic" transform="translate(1256.671875, 302)"><rect class="basic label-container" style="" x="-109.6015625" y="-27" width="219.203125" height="54"/><g class="label" style="" transform="translate(-79.6015625, -12)"><rect/><foreignObject width="159.203125" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Suite run via robot CLI</p></span></div></foreignObject></g></g><g class="node default" id="my-svg-flowchart-G-6" data-look="classic" transform="translate(1568.140625, 198)"><rect class="basic label-container" style="" x="-106.46875" y="-27" width="212.9375" height="54"/><g class="label" style="" transform="translate(-76.46875, -12)"><rect/><foreignObject width="152.9375" height="24"><div xmlns="http://www.w3.org/1999/xhtml" style="display: table-cell; white-space: nowrap; line-height: 1.5; max-width: 200px; text-align: center;"><span class="nodeLabel"><p>Robot Framework 7.x</p></span></div></foreignObject></g></g></g></g></g><defs><filter id="my-svg-drop-shadow" height="130%" width="130%"><feDropShadow dx="4" dy="4" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs><defs><filter id="my-svg-drop-shadow-small" height="150%" width="150%"><feDropShadow dx="2" dy="2" stdDeviation="0" flood-opacity="0.06" flood-color="#000000"/></filter></defs></svg>
+        <div class="figcap"><b>Figure 1</b> · System context — generated from canonical Mermaid source</div>
+      </div>
+    </div>
+
+    <div class="card span-7">
+      <h2><span class="glyph">✓</span>Key decisions</h2>
+      <p class="sub">Four adopted, zero pending</p>
+      <div class="dec-grid">
+        <div class="dec"><div class="head"><h3>Live, in-process RF context</h3><span class="tag">ADR-020</span></div><p>Stateful and interactive — live variables, real page source, immediate feedback.</p></div>
+        <div class="dec"><div class="head"><h3>Three backends, not one</h3><span class="tag">Adopted</span></div><p>In-process for speed, attach for debugger sessions, CLI for full runs.</p></div>
+        <div class="dec"><div class="head"><h3>Keyword discovery by reflection</h3><span class="tag">Adopted</span></div><p>Read live library instances via introspection — sees exactly what is loaded.</p></div>
+        <div class="dec"><div class="head"><h3>Optimize for small LLMs</h3><span class="tag">Adopted</span></div><p>Tool profiles, intent actions, response compression keep token budgets honest.</p></div>
+      </div>
+    </div>
+
+    <div class="card span-5">
+      <h2><span class="glyph">▥</span>Scope coverage</h2>
+      <p class="sub">Library families exercised by the live context</p>
+      <div class="meter-row"><div class="top"><b>Web — Browser / Selenium</b><span>full</span></div><div class="meter"><i style="width:100%"></i></div></div>
+      <div class="meter-row"><div class="top"><b>API — Requests</b><span>full</span></div><div class="meter"><i style="width:100%"></i></div></div>
+      <div class="meter-row"><div class="top"><b>Mobile — Appium</b><span>broad</span></div><div class="meter"><i style="width:78%"></i></div></div>
+      <div class="meter-row"><div class="top"><b>Database</b><span>broad</span></div><div class="meter"><i style="width:72%"></i></div></div>
+      <div class="meter-row"><div class="top"><b>Memory / recall</b><span>optional</span></div><div class="meter"><i style="width:45%"></i></div></div>
+    </div>
+
+    <div class="card span-12">
+      <h2><span class="glyph">→</span>From plain words to a passing suite</h2>
+      <div class="flow">
+        <div class="step"><span class="num">1</span><b>Describe intent</b><p>analyze_scenario + recommend_libraries turn plain words into a plan.</p></div>
+        <div class="step"><span class="num">2</span><b>Discover keywords</b><p>find_keywords reads signatures from live library instances.</p></div>
+        <div class="step"><span class="num">3</span><b>Execute stepwise</b><p>Each execute_step runs live and returns result, page source, state.</p></div>
+        <div class="step"><span class="num">4</span><b>Write &amp; run</b><p>build_test_suite emits a clean .robot file; run_test_suite reports with receipts.</p></div>
+      </div>
+    </div>
+
+    <div class="card span-12">
+      <h2><span class="glyph">⛁</span>Three ways to execute</h2>
+      <div class="table-wrap">
+        <table>
+          <thead><tr><th>Backend</th><th>How it works</th><th>Best for</th></tr></thead>
+          <tbody>
+            <tr><td>Native in-process</td><td>Runs keywords inside a live RF 7.x context via <code>EXECUTION_CONTEXTS</code> and <code>Namespace</code></td><td>Fast, stateful, interactive step-building</td></tr>
+            <tr><td>Attach bridge</td><td>Talks to a real RF process over HTTP on port 7317 using <code>McpAttach</code></td><td>Reusing a live debugger session from your IDE</td></tr>
+            <tr><td>Suite run</td><td>Shells out to <code>robot</code> or <code>run_cli</code> and parses <code>output.xml</code></td><td>Full runs and dry runs of finished suites</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card span-12 evidence">
+      <h2><span class="glyph">¶</span>Evidence</h2>
+      <p class="sub">Sources backing this review</p>
+      <a href="#">↗ Repository — manykarim/rf-mcp</a>
+      <a href="#">↗ ADR-020 — namespace execution</a>
+      <a href="#">↗ ADR-019 — BDD &amp; data-driven</a>
+      <a href="#">↗ RF visual identity</a>
+    </div>
+
+  </div>
+
+  <footer>Generated from canonical source · architecture-review · schema v1</footer>
+</div>
+</body>
+</html>

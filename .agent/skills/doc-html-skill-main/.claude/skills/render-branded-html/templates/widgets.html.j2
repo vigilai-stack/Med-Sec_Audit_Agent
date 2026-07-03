@@ -1,0 +1,290 @@
+{# widgets.html.j2 — shared widget macro library.
+   One macro set consumed by every skin; skins control scaffold + styling only.
+   Internal-only kinds (from overlay normalization): list, checklist, severitylist. #}
+
+{%- macro prose(section) -%}
+<div class="prose">
+  {% for para in section.body.split("\n\n") %}
+  <p>{{ para }}</p>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{%- macro mermaid(section, frozen, frozen_svgs) -%}
+<figure class="figure figure--diagram" id="fig-{{ section.id }}">
+  <input type="checkbox" id="figzoom-{{ section.id }}" class="fig-zoom-toggle" aria-label="Expand diagram: {{ section.title }}">
+  <div class="fig-frame">
+    <label class="fig-zoom-btn" for="figzoom-{{ section.id }}">
+      <span class="fz-open">⤢ Expand</span><span class="fz-close">✕ Close</span>
+    </label>
+    <div class="fig-stage">
+      {% if frozen and frozen_svgs.get(section.id) %}
+        {{ frozen_svgs.get(section.id) | safe }}
+      {% else %}
+        <pre class="mermaid">{{ section.source }}</pre>
+      {% endif %}
+    </div>
+  </div>
+  <figcaption><b>Figure {{ section.fig_no }}.</b> {{ section.caption or section.title }}</figcaption>
+</figure>
+{%- endmacro -%}
+
+{%- macro table(section) -%}
+<div class="table-wrap">
+  <table class="data">
+    <thead>
+      <tr>
+        {% for col in section.columns %}<th>{{ col }}</th>{% endfor %}
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in section.rows %}
+      <tr>
+        {% for cell in row %}<td>{{ "" if cell is none else cell }}</td>{% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro -%}
+
+{%- macro callout(section) -%}
+<div class="callout callout--{{ section.intent }}" role="note">
+  <span class="callout-icon" aria-hidden="true"></span>
+  <div class="callout-body">
+    {% for para in section.body.split("\n\n") %}
+    <p>{{ para }}</p>
+    {% endfor %}
+  </div>
+</div>
+{%- endmacro -%}
+
+{%- macro stats(section) -%}
+<div class="stats">
+  {% for item in section["items"] %}
+  <div class="stat">
+    <div class="stat-value">{{ item.value }}</div>
+    <div class="stat-label">{{ item.label }}</div>
+    {% if item.delta %}<div class="stat-delta">{{ item.delta }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{%- macro steps(section) -%}
+<ol class="steps">
+  {% for item in section["items"] %}
+  <li>
+    <b>{{ item.title }}</b>
+    {% if item.body %}<p>{{ item.body }}</p>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{%- endmacro -%}
+
+{%- macro cards(section) -%}
+<div class="cards cards--{{ section.variant or 'generic' }}">
+  {% for item in section["items"] %}
+  <div class="card-item">
+    <div class="card-head">
+      <h3>{{ item.title }}</h3>
+      {% if item.tag %}<span class="card-tag">{{ item.tag }}</span>{% endif %}
+    </div>
+    {% if item.body %}<p>{{ item.body }}</p>{% endif %}
+    {% if item.ref %}<div class="card-ref">{{ item.ref }}</div>{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{%- macro keyvalue(section) -%}
+<dl class="keyvalue">
+  {% for item in section["items"] %}
+  <div class="kv-row">
+    <dt>{{ item.key }}</dt>
+    <dd>{{ item.value }}</dd>
+  </div>
+  {% endfor %}
+</dl>
+{%- endmacro -%}
+
+{%- macro code(section) -%}
+<div class="codeblock">
+  <div class="code-head">
+    <span class="code-name">{{ section.filename or section.language or "code" }}</span>
+    {% if section.language and section.filename %}<span class="code-lang">{{ section.language }}</span>{% endif %}
+    <button type="button" class="copy-btn" hidden>Copy</button>
+  </div>
+  <pre class="code-body"><code>{{ section.source }}</code></pre>
+</div>
+{%- endmacro -%}
+
+{%- macro tabs(section) -%}
+<div class="tabs">
+  {% for item in section["items"] %}
+  <input type="radio" id="tab-{{ section.id }}-{{ loop.index }}" name="tabs-{{ section.id }}" class="tab-radio"{% if loop.first %} checked{% endif %}>
+  {% endfor %}
+  <nav class="tab-bar">
+    {% for item in section["items"] %}
+    <label for="tab-{{ section.id }}-{{ loop.index }}">{{ item.label }}</label>
+    {% endfor %}
+  </nav>
+  {% for item in section["items"] %}
+  <div class="tab-pane" data-label="{{ item.label }}">
+    {% if item.code %}<pre class="tab-code"><code>{{ item.body }}</code></pre>
+    {% else %}{% for para in item.body.split("\n\n") %}<p>{{ para }}</p>{% endfor %}{% endif %}
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{%- macro details(section) -%}
+<details class="details">
+  <summary>{{ section.summary }}</summary>
+  <div class="details-body">
+    {% for para in section.body.split("\n\n") %}
+    <p>{{ para }}</p>
+    {% endfor %}
+  </div>
+</details>
+{%- endmacro -%}
+
+{%- macro timeline(section) -%}
+<ol class="timeline">
+  {% for item in section["items"] %}
+  <li>
+    <div class="tl-head">
+      <b>{{ item.label }}</b>
+      {% if item.date %}<span class="tl-date">{{ item.date }}</span>{% endif %}
+    </div>
+    {% if item.body %}<p>{{ item.body }}</p>{% endif %}
+  </li>
+  {% endfor %}
+</ol>
+{%- endmacro -%}
+
+{%- macro heatmap(section) -%}
+<div class="heatmap-wrap">
+  <table class="heatmap">
+    <thead>
+      <tr><th></th>{% for x in section.x_labels %}<th scope="col">{{ x }}</th>{% endfor %}</tr>
+    </thead>
+    <tbody>
+      {% for row in section.grid %}
+      <tr>
+        <th scope="row">{{ section.y_labels[loop.index0] }}</th>
+        {% for cell in row %}
+        {% if cell %}
+        <td class="heat heat--{{ cell.level }}"><span class="heat-label">{{ cell.label or cell.level }}</span></td>
+        {% else %}
+        <td class="heat heat--empty"></td>
+        {% endif %}
+        {% endfor %}
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</div>
+{%- endmacro -%}
+
+{%- macro meters(section) -%}
+<div class="meters">
+  {% for item in section["items"] %}
+  <div class="meter-row">
+    <div class="meter-top">
+      <b>{{ item.label }}</b>
+      <span>{{ item.note or (item.value | string) + "%" }}</span>
+    </div>
+    <div class="meter" role="img" aria-label="{{ item.label }}: {{ item.value }} of 100">
+      <i style="width: {{ item.value }}%"></i>
+    </div>
+  </div>
+  {% endfor %}
+</div>
+{%- endmacro -%}
+
+{# ---- internal kinds (overlay normalization) ---- #}
+
+{%- macro list_(section) -%}
+<ul class="plainlist">
+  {% for item in section["items"] %}
+  <li>{{ item }}</li>
+  {% endfor %}
+</ul>
+{%- endmacro -%}
+
+{%- macro checklist(section) -%}
+<ul class="checklist">
+  {% for item in section["items"] %}
+  <li><span class="tick" aria-hidden="true">✓</span><span>{{ item }}</span></li>
+  {% endfor %}
+</ul>
+{%- endmacro -%}
+
+{%- macro severitylist(section) -%}
+<ul class="sevlist">
+  {% for item in section["items"] %}
+  <li>
+    <span class="sev sev--{{ item.severity }}">{{ item.severity }}</span>
+    <span>{{ item.text }}</span>
+  </li>
+  {% endfor %}
+</ul>
+{%- endmacro -%}
+
+{# ---- dispatch ---- #}
+
+{%- macro body(section, frozen, frozen_svgs) -%}
+{% if section.kind == "prose" %}{{ prose(section) }}
+{% elif section.kind == "mermaid" %}{{ mermaid(section, frozen, frozen_svgs) }}
+{% elif section.kind == "table" %}{{ table(section) }}
+{% elif section.kind == "callout" %}{{ callout(section) }}
+{% elif section.kind == "stats" %}{{ stats(section) }}
+{% elif section.kind == "steps" %}{{ steps(section) }}
+{% elif section.kind == "cards" %}{{ cards(section) }}
+{% elif section.kind == "keyvalue" %}{{ keyvalue(section) }}
+{% elif section.kind == "code" %}{{ code(section) }}
+{% elif section.kind == "tabs" %}{{ tabs(section) }}
+{% elif section.kind == "details" %}{{ details(section) }}
+{% elif section.kind == "timeline" %}{{ timeline(section) }}
+{% elif section.kind == "heatmap" %}{{ heatmap(section) }}
+{% elif section.kind == "meters" %}{{ meters(section) }}
+{% elif section.kind == "list" %}{{ list_(section) }}
+{% elif section.kind == "checklist" %}{{ checklist(section) }}
+{% elif section.kind == "severitylist" %}{{ severitylist(section) }}
+{% endif %}
+{%- endmacro -%}
+
+{# ---- shared document fragments ---- #}
+
+{%- macro summary(artifact) -%}
+{% if artifact.summary %}
+<section class="summary" aria-label="Executive summary">
+  <h2>Summary</h2>
+  <ul class="checklist">
+    {% for point in artifact.summary %}
+    <li><span class="tick" aria-hidden="true">✓</span><span>{{ point }}</span></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{%- endmacro -%}
+
+{%- macro evidence(artifact) -%}
+{% if artifact.evidence %}
+<section class="evidence" aria-label="Evidence">
+  <h2>Evidence</h2>
+  <ul>
+    {% for item in artifact.evidence %}
+    <li><span class="ev-no">[{{ loop.index }}]</span> <a href="{{ item.href }}">{{ item.label }}</a> <code>{{ item.href }}</code></li>
+    {% endfor %}
+  </ul>
+</section>
+{% endif %}
+{%- endmacro -%}
+
+{%- macro footer(artifact) -%}
+<footer class="doc-footer">
+  <span>Generated from canonical source · {{ artifact.artifact_type }} · schema v{{ artifact.schema_version }}</span>
+</footer>
+{%- endmacro -%}

@@ -1,0 +1,86 @@
+# Project Configuration File
+project:
+  name: "Kaggle Capstone Project June 2026"
+  version: "1.0.0"
+
+# Paths - Relative to BASE_PATH
+paths:
+  data_folder: "Data/"
+  patient_data: "Data/patient_records.csv"
+  payload_data: "Data/payloads.csv"
+  output_folder: "medsec_sandbox/output/"
+  logs_folder: "medsec_sandbox/logs/"
+  knowledge_base: "knowledge_base/"          # NEW: RAG knowledge base path
+  vector_store: "knowledge_base/vector_store/"  # NEW: Vector store path
+
+# Orchestrator Settings
+orchestrator:
+  audit_phases:
+    - baseline_establishment
+    - adversarial_testing
+    - threat_detection
+    - auto_remediation
+    - compliance_verification
+  parallel_execution: false
+  log_level: "INFO"
+
+# Blue Team - Baseline Establishment
+blue_team:
+  metrics:
+    - data_quality
+    - completeness
+    - consistency
+    - accuracy
+  threshold: 0.95
+
+# Red Team - Adversarial Testing
+red_team:
+  payload_types:
+    - sql_injection
+    - xss
+    - command_injection
+    - path_traversal
+  severity_levels:
+    - low
+    - medium
+    - high
+    - critical
+
+# Green Team - Auto-Remediation
+green_team:
+  auto_fix: true
+  backup_before_fix: true
+  max_attempts: 3
+
+# Compliance Agent
+compliance:
+  regulations:
+    - HIPAA
+    - GDPR
+    - FDA_21_CFR_Part_11
+  strict_mode: true
+
+# RAG Settings (NEW)
+rag:
+  enabled: true
+  embedding_model: "sentence-transformers/all-MiniLM-L6-v2"
+  chunk_size: 500
+  chunk_overlap: 50
+  top_k: 4
+  weights:
+    dense: 0.5
+    sparse: 0.5
+  auto_load: true
+
+# MCP Server Settings
+mcp_server:
+  host: "localhost"
+  port: 8000
+  timeout: 30
+  max_connections: 10
+
+# Logging
+logging:
+  level: "INFO"
+  format: "%(asctime)s - %(name)s - %(levelname)s - %(message)s"
+  file: "medsec_sandbox/logs/audit.log"

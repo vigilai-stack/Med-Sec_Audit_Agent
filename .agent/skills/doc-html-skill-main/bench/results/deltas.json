@@ -1,0 +1,50 @@
+{
+  "claude": {
+    "out_tokens_pct": -35.1,
+    "total_tokens_pct": 278.0,
+    "cost_pct": 9.9,
+    "wall_pct": -3.3,
+    "out_ns": 7808.6667,
+    "out_sk": 5071.6667,
+    "total_ns": 63185,
+    "total_sk": 238843.6667,
+    "cost_ns": 0.3199,
+    "cost_sk": 0.3517
+  },
+  "codex": {
+    "out_tokens_pct": -31.6,
+    "total_tokens_pct": 166.3,
+    "cost_pct": null,
+    "wall_pct": -21.2,
+    "out_ns": 7263,
+    "out_sk": 4965,
+    "total_ns": 205477,
+    "total_sk": 547176,
+    "cost_ns": null,
+    "cost_sk": null
+  },
+  "kilo": {
+    "out_tokens_pct": 27.6,
+    "total_tokens_pct": 401.9,
+    "cost_pct": 115.6,
+    "wall_pct": 52.1,
+    "out_ns": 2884,
+    "out_sk": 3678.6667,
+    "total_ns": 43605,
+    "total_sk": 218851,
+    "cost_ns": 0.0109,
+    "cost_sk": 0.0235
+  },
+  "opencode": {
+    "out_tokens_pct": -8.1,
+    "total_tokens_pct": 169.8,
+    "cost_pct": 40.8,
+    "wall_pct": -7.3,
+    "out_ns": 2525.3333,
+    "out_sk": 2321.3333,
+    "total_ns": 39071.6667,
+    "total_sk": 105410,
+    "cost_ns": 0.0434,
+    "cost_sk": 0.0611
+  }
+}

@@ -1,0 +1,153 @@
+/*
+ * skins/editorial.css — serif, print-first report layout.
+ * Masthead with double rule, numbered sections, hairline tables, ledger-style
+ * cards. The brand `primary` token plays the accent role.
+ * Pairs with templates/skins/editorial.html.j2.
+ */
+
+body.skin-editorial {
+  font-family: var(--font-serif);
+  font-size: 17.5px;
+  line-height: 1.7;
+}
+
+.page { max-width: 780px; margin: 0 auto; padding: 64px var(--space-page-x) 110px; }
+
+/* ── masthead ──────────────────────────────────────────────── */
+.masthead { border-bottom: 3px double var(--color-line-strong); padding-bottom: 34px; margin-bottom: 44px; }
+.kicker {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.2em;
+  font-size: 0.72rem;
+  font-weight: 700;
+  color: var(--color-primary-strong);
+  margin: 0 0 18px;
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+.kicker .right { color: var(--color-text-dim); letter-spacing: 0.1em; font-weight: 500; }
+.masthead h1 { font-size: 3rem; line-height: 1.06; margin: 0 0 14px; font-weight: 600; }
+.deck { font-size: 1.3rem; line-height: 1.45; color: var(--color-text-dim); margin: 0 0 26px; font-style: italic; }
+.byline { font-family: var(--font-sans); font-size: 0.84rem; color: var(--color-text-dim); display: flex; gap: 22px; flex-wrap: wrap; }
+.byline b { color: var(--color-text); }
+.byline .status {
+  color: var(--color-primary-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  font-weight: 700;
+  font-size: 0.76rem;
+}
+
+/* ── abstract ──────────────────────────────────────────────── */
+.abstract { margin: 0 0 52px; padding-left: 26px; border-left: 3px solid var(--color-primary); }
+.abstract .label {
+  font-family: var(--font-sans);
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  font-size: 0.68rem;
+  font-weight: 700;
+  color: var(--color-text-dim);
+  margin: 0 0 10px;
+}
+.abstract ul { margin: 0; padding: 0; list-style: none; }
+.abstract li { margin-bottom: 10px; font-size: 1.04rem; }
+.abstract li::before { content: "— "; color: var(--color-primary-strong); }
+
+/* ── numbered sections ─────────────────────────────────────── */
+.section { margin-bottom: 64px; }
+.sec-head { display: flex; align-items: baseline; gap: 18px; margin-bottom: 20px; }
+.sec-head .no {
+  font-family: var(--font-sans);
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--color-primary-strong);
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+.sec-head h2 { font-size: 1.8rem; font-weight: 600; margin: 0; }
+
+/* ── widget reskins: flatten card chrome to hairlines ──────── */
+.cards { grid-template-columns: 1fr; gap: 0; }
+.card-item {
+  border: 0;
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+  padding: 20px 0;
+}
+.card-item:first-child { border-top: 1px solid var(--color-line-strong); }
+.cards--decision .card-item::before, .cards--rejected .card-item::before,
+.cards--persona .card-item::before { display: none; }
+.card-item h3 { font-size: 1.12rem; }
+.card-tag {
+  background: transparent;
+  color: var(--color-primary-strong);
+  border-radius: 0;
+  letter-spacing: 0.14em;
+  padding: 0;
+}
+.cards--rejected .card-tag { background: transparent; color: var(--color-danger); }
+
+.stat { border: 0; border-radius: 0; background: transparent; text-align: center; padding: 18px 12px; }
+.stats {
+  gap: 0;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  border-top: 1px solid var(--color-line-strong);
+  border-bottom: 1px solid var(--color-line-strong);
+}
+.stat + .stat { border-left: 1px solid var(--color-line); }
+.stat-value { font-size: 2.1rem; font-weight: 600; }
+.stat-label { font-family: var(--font-sans); text-transform: uppercase; letter-spacing: 0.12em; font-size: 0.68rem; }
+
+.table-wrap { border: 0; border-radius: 0; background: transparent; }
+table.data th {
+  font-family: var(--font-sans);
+  background: transparent;
+  border-bottom: 1.5px solid var(--color-line-strong);
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  color: var(--color-text-dim);
+  padding-left: 0;
+}
+table.data td { padding-left: 0; border-bottom-color: var(--color-line); }
+
+.fig-frame {
+  border: 0;
+  border-top: 1px solid var(--color-line-strong);
+  border-bottom: 1px solid var(--color-line);
+  border-radius: 0;
+  background: transparent;
+}
+figcaption { font-family: var(--font-sans); }
+
+.callout { border: 0; border-left: 3px solid currentColor; border-radius: 0; }
+.keyvalue dt, .meter-top, .sevlist, .checklist, .plainlist, .steps { font-family: inherit; }
+.sev, .tl-date, .stat-label, .toc-label { font-family: var(--font-sans); }
+
+/* ── evidence + colophon ───────────────────────────────────── */
+.evidence { font-family: var(--font-sans); }
+.evidence ol { list-style: decimal; padding-left: 22px; display: block; }
+.evidence li { margin-bottom: 8px; color: var(--color-text-dim); }
+.evidence a {
+  color: var(--color-text);
+  font-weight: 600;
+  text-decoration: none;
+  border-bottom: 1px solid var(--color-primary);
+}
+.ev-href { font-size: 0.8rem; }
+.colophon {
+  margin-top: 76px;
+  border-top: 3px double var(--color-line-strong);
+  padding-top: 20px;
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  color: var(--color-text-dim);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}

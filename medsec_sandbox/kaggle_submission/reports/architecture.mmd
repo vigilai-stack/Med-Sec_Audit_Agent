@@ -1,0 +1,37 @@
+
+        graph TD
+            subgraph "User Layer"
+                U[👤 Developer / User]
+            end
+
+            subgraph "Orchestrator Layer"
+                O[🎯 OrchestratorSupervisor]
+                O --> P1 & P2 & P3 & P4 & P5
+            end
+
+            subgraph "MCP Server"
+                M1[🔒 Tool: Anonymize PHI]
+                M2[🛡️ Tool: Detect Threat]
+                M3[📋 Tool: Compliance Check]
+            end
+
+            subgraph "Audit Pipeline"
+                P1[📊 Phase 1: Baseline - Blue Team] --> P2[🔴 Phase 2: Red Team]
+                P2 --> P3[🔵 Phase 3: Blue Team]
+                P3 --> P4[🟢 Phase 4: Green Team]
+                P4 --> P5[📋 Phase 5: Compliance]
+            end
+
+            subgraph "Agent Teams"
+                RT[🔴 Red Team<br/>Adversarial Testing]
+                BT[🔵 Blue Team<br/>Threat Detection]
+                GT[🟢 Green Team<br/>Auto-Remediation]
+                CA[📋 Compliance<br/>HIPAA Validation]
+            end
+
+            U --> O
+            O --> M1 & M2 & M3
+            P5 --> R[📊 Audit Results]
+
+            RT --> BT --> GT --> CA
+        

@@ -1,0 +1,14 @@
+
+on_http_request:
+  - name: RequireGoogleOAuth
+    actions:
+      - type: oauth
+        config:
+          provider: google
+
+  - name: RestrictToAllowedEmails
+    expressions:
+      - actions.ngrok.oauth.identity.email != 'sangeetasinha7@gmail.com'
+      - actions.ngrok.oauth.identity.email != 'chittranjan.garg@gmail.com'
+    actions:
+      - type: deny

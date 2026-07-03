@@ -1,0 +1,64 @@
+schema_version: 2
+artifact_type: prd-review
+title: Self-Serve Refunds PRD Review
+subtitle: Coverage, scope, and readiness assessment
+audience:
+- Product
+- Delivery
+- Support
+status: draft
+owner: Refunds PM
+updated_at: '2026-05-30'
+business_goals:
+- Reduce refund-related support tickets by 30%.
+- Cut median refund resolution time to under 2 minutes.
+out_of_scope:
+- Partial refunds across multiple payment methods.
+- Refunds for subscription proration.
+requirement_coverage:
+- requirement: Shopper can request a refund for an eligible order.
+  covered: true
+  notes: Eligibility rules defined.
+- requirement: Refund status is visible in the order history.
+  covered: true
+- requirement: Support can override an auto-declined refund.
+  covered: false
+  notes: Override flow not specified.
+stakeholders:
+- Support Operations
+- Finance
+summary:
+- Happy-path coverage is strong; the override path is undefined.
+- Finance reconciliation requirements are missing.
+sections:
+- id: goals
+  title: Goals and success metrics
+  kind: prose
+  body: |
+    The PRD targets fewer support tickets and faster resolution through a self-serve refund flow gated by eligibility rules.
+- id: coverage
+  title: Requirement coverage
+  kind: table
+  columns:
+  - requirement
+  - covered
+  - notes
+  rows:
+  - - Request refund for eligible order
+    - 'yes'
+    - Eligibility rules defined
+  - - Refund status in order history
+    - 'yes'
+    - ''
+  - - Support override of auto-decline
+    - 'no'
+    - Override flow not specified
+  - - Finance reconciliation export
+    - 'no'
+    - Not addressed
+evidence:
+- label: Refunds PRD
+  href: docs/prd/self-serve-refunds.md
+export:
+  pdf: true
+  freeze_diagrams: false

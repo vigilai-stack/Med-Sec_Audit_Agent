@@ -1,0 +1,24 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/prd-review.schema.json",
+  "title": "PRD Review (overlay)",
+  "allOf": [{ "$ref": "review-artifact.schema.json" }],
+  "properties": {
+    "artifact_type": { "const": "prd-review" },
+    "business_goals": { "type": "array", "items": { "type": "string" } },
+    "out_of_scope": { "type": "array", "items": { "type": "string" } },
+    "requirement_coverage": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["requirement"],
+        "properties": {
+          "requirement": { "type": "string" },
+          "covered": { "type": "boolean" },
+          "notes": { "type": "string" }
+        }
+      }
+    },
+    "stakeholders": { "type": "array", "items": { "type": "string" } }
+  }
+}

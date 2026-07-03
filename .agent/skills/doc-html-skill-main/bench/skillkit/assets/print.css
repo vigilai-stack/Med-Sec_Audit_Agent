@@ -1,0 +1,37 @@
+/*
+ * print.css — paged-media overrides for PDF export. Applied on top of
+ * theme.css. Forces print color adjustment, sensible page margins, and
+ * avoids breaking sections/diagrams across pages.
+ */
+
+@page {
+  size: A4;
+  margin: 18mm 16mm;
+}
+
+:root {
+  /* Print on white regardless of theme mode for legibility and ink cost. */
+  --color-bg: #FFFFFF;
+  --color-surface: #FFFFFF;
+}
+
+html, body {
+  background: #FFFFFF;
+  -webkit-print-color-adjust: exact;
+  print-color-adjust: exact;
+}
+
+.doc-shell { max-width: 100%; padding: 0; }
+
+.hero, .summary, .section, .evidence {
+  break-inside: avoid;
+  box-shadow: none;
+}
+
+.section h2, .hero h1 { break-after: avoid; }
+
+.mermaid-wrap, table.data { break-inside: avoid; }
+
+a { color: var(--color-primary); text-decoration: none; }
+
+.doc-footer { break-before: avoid; }

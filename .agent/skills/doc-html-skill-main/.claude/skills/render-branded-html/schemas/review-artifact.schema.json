@@ -1,0 +1,362 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.com/schemas/review-artifact.schema.json",
+  "title": "Review Artifact (base)",
+  "description": "Shared base schema for all branded review documents. Artifact-specific schemas extend this via $ref + allOf.",
+  "type": "object",
+  "required": ["schema_version", "artifact_type", "title"],
+  "comment": "Top-level additionalProperties is intentionally open so artifact overlays can add fields via allOf. Nested $defs stay strict.",
+  "properties": {
+    "schema_version": {
+      "type": "integer",
+      "const": 2,
+      "description": "Schema major version. v2 adds the widget section kinds, theme.layout, and width hints."
+    },
+    "artifact_type": {
+      "type": "string",
+      "enum": [
+        "user-story-review",
+        "architecture-review",
+        "prd-review",
+        "risk-analysis",
+        "test-charter"
+      ]
+    },
+    "title": { "type": "string", "minLength": 1 },
+    "subtitle": { "type": "string" },
+    "audience": {
+      "type": "array",
+      "items": { "type": "string" },
+      "uniqueItems": true
+    },
+    "status": {
+      "type": "string",
+      "enum": ["draft", "in-review", "approved", "archived"],
+      "default": "draft"
+    },
+    "owner": { "type": "string" },
+    "updated_at": { "type": "string", "format": "date" },
+    "theme": { "$ref": "#/$defs/theme" },
+    "summary": {
+      "type": "array",
+      "items": { "type": "string", "minLength": 1 },
+      "description": "Executive-summary bullet points."
+    },
+    "sections": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/section" }
+    },
+    "evidence": {
+      "type": "array",
+      "items": { "$ref": "#/$defs/evidence_link" }
+    },
+    "export": { "$ref": "#/$defs/export" }
+  },
+  "$defs": {
+    "theme": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "mode": { "type": "string", "enum": ["light", "dark", "auto"], "default": "auto" },
+        "brand": { "type": "string", "default": "default" },
+        "density": { "type": "string", "enum": ["compact", "comfortable", "spacious"], "default": "comfortable" },
+        "layout": {
+          "type": "string",
+          "enum": ["docs-site", "editorial", "brief"],
+          "description": "Render skin. Omit to use the artifact type's default skin."
+        }
+      }
+    },
+    "evidence_link": {
+      "type": "object",
+      "required": ["label", "href"],
+      "additionalProperties": false,
+      "properties": {
+        "label": { "type": "string", "minLength": 1 },
+        "href": { "type": "string", "minLength": 1 }
+      }
+    },
+    "export": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "pdf": { "type": "boolean", "default": false },
+        "freeze_diagrams": { "type": "boolean", "default": false }
+      }
+    },
+    "severity": {
+      "type": "string",
+      "enum": ["high", "medium", "low", "info"]
+    },
+    "section": {
+      "type": "object",
+      "required": ["id", "title", "kind"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "title": { "type": "string", "minLength": 1 },
+        "kind": {
+          "type": "string",
+          "enum": [
+            "prose", "mermaid", "table",
+            "callout", "stats", "steps", "cards", "keyvalue",
+            "code", "tabs", "details", "timeline", "heatmap", "meters"
+          ]
+        },
+        "width": {
+          "type": "string",
+          "enum": ["full", "half"],
+          "default": "full",
+          "description": "Layout hint. Honored by the brief skin's grid; ignored elsewhere."
+        }
+      },
+      "oneOf": [
+        {
+          "title": "Prose section",
+          "properties": {
+            "kind": { "const": "prose" },
+            "body": { "type": "string", "minLength": 1 }
+          },
+          "required": ["body"]
+        },
+        {
+          "title": "Mermaid section",
+          "properties": {
+            "kind": { "const": "mermaid" },
+            "diagram_type": {
+              "type": "string",
+              "enum": [
+                "flowchart", "sequence", "er", "state", "journey",
+                "timeline", "class", "gantt", "mindmap", "graph",
+                "xychart", "quadrant", "pie"
+              ]
+            },
+            "source": { "type": "string", "minLength": 1 },
+            "caption": { "type": "string" }
+          },
+          "required": ["diagram_type", "source"]
+        },
+        {
+          "title": "Table section",
+          "properties": {
+            "kind": { "const": "table" },
+            "columns": {
+              "type": "array",
+              "items": { "type": "string" },
+              "minItems": 1
+            },
+            "rows": {
+              "type": "array",
+              "items": {
+                "type": "array",
+                "items": { "type": ["string", "number", "boolean", "null"] }
+              }
+            }
+          },
+          "required": ["columns", "rows"]
+        },
+        {
+          "title": "Callout section",
+          "properties": {
+            "kind": { "const": "callout" },
+            "intent": { "type": "string", "enum": ["note", "tip", "warning", "danger"] },
+            "body": { "type": "string", "minLength": 1 }
+          },
+          "required": ["intent", "body"]
+        },
+        {
+          "title": "Stats section",
+          "properties": {
+            "kind": { "const": "stats" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["value", "label"],
+                "additionalProperties": false,
+                "properties": {
+                  "value": { "type": ["string", "number"] },
+                  "label": { "type": "string", "minLength": 1 },
+                  "delta": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Steps section",
+          "properties": {
+            "kind": { "const": "steps" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["title", "body"],
+                "additionalProperties": false,
+                "properties": {
+                  "title": { "type": "string", "minLength": 1 },
+                  "body": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Cards section",
+          "properties": {
+            "kind": { "const": "cards" },
+            "variant": {
+              "type": "string",
+              "enum": ["generic", "decision", "rejected", "persona"],
+              "default": "generic"
+            },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["title", "body"],
+                "additionalProperties": false,
+                "properties": {
+                  "title": { "type": "string", "minLength": 1 },
+                  "body": { "type": "string" },
+                  "tag": { "type": "string" },
+                  "ref": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Key-value section",
+          "properties": {
+            "kind": { "const": "keyvalue" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["key", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "key": { "type": "string", "minLength": 1 },
+                  "value": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Code section",
+          "properties": {
+            "kind": { "const": "code" },
+            "source": { "type": "string", "minLength": 1 },
+            "language": { "type": "string" },
+            "filename": { "type": "string" }
+          },
+          "required": ["source"]
+        },
+        {
+          "title": "Tabs section",
+          "properties": {
+            "kind": { "const": "tabs" },
+            "items": {
+              "type": "array",
+              "minItems": 2,
+              "items": {
+                "type": "object",
+                "required": ["label", "body"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "body": { "type": "string" },
+                  "code": { "type": "boolean", "default": false }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Details section",
+          "properties": {
+            "kind": { "const": "details" },
+            "summary": { "type": "string", "minLength": 1 },
+            "body": { "type": "string", "minLength": 1 }
+          },
+          "required": ["summary", "body"]
+        },
+        {
+          "title": "Timeline section",
+          "properties": {
+            "kind": { "const": "timeline" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["label", "body"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "body": { "type": "string" },
+                  "date": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        },
+        {
+          "title": "Heatmap section",
+          "properties": {
+            "kind": { "const": "heatmap" },
+            "x_labels": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "y_labels": { "type": "array", "items": { "type": "string" }, "minItems": 1 },
+            "cells": {
+              "type": "array",
+              "items": {
+                "type": "object",
+                "required": ["x", "y", "level"],
+                "additionalProperties": false,
+                "properties": {
+                  "x": { "type": "integer", "minimum": 0 },
+                  "y": { "type": "integer", "minimum": 0 },
+                  "level": { "type": "integer", "minimum": 1, "maximum": 5 },
+                  "label": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["x_labels", "y_labels", "cells"]
+        },
+        {
+          "title": "Meters section",
+          "properties": {
+            "kind": { "const": "meters" },
+            "items": {
+              "type": "array",
+              "minItems": 1,
+              "items": {
+                "type": "object",
+                "required": ["label", "value"],
+                "additionalProperties": false,
+                "properties": {
+                  "label": { "type": "string", "minLength": 1 },
+                  "value": { "type": "number", "minimum": 0, "maximum": 100 },
+                  "note": { "type": "string" }
+                }
+              }
+            }
+          },
+          "required": ["items"]
+        }
+      ]
+    }
+  }
+}

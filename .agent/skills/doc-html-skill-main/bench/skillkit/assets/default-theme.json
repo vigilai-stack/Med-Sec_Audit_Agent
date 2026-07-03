@@ -1,0 +1,28 @@
+{
+  "name": "default",
+  "logo_url": null,
+  "color": {
+    "bg": "#F8FAFC",
+    "surface": "#FFFFFF",
+    "text": "#0F172A",
+    "text_dim": "#475569",
+    "line": "#64748B",
+    "primary": "#0063B1",
+    "primary_soft": "#DCEEFF",
+    "success": "#0F9D58",
+    "warning": "#F59E0B",
+    "danger": "#DC2626"
+  },
+  "font": {
+    "sans": "Inter, Arial, sans-serif",
+    "serif": "Source Serif 4, Georgia, serif",
+    "mono": "JetBrains Mono, Consolas, monospace"
+  },
+  "radius": {
+    "card": "16px"
+  },
+  "spacing": {
+    "page_x": "24px",
+    "section_y": "32px"
+  }
+}

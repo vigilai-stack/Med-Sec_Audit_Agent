@@ -1,0 +1,43 @@
+{
+  "name": "doc-html-skill",
+  "version": "0.1.0",
+  "description": "Schema-first branded HTML documentation skills for Claude Code: deterministic renderer, widget library, three layout skins, dark mode, Mermaid theming, layered validation. `npx doc-html-skill install` copies the skills into your project.",
+  "type": "module",
+  "license": "Apache-2.0",
+  "author": "manykarim",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/manykarim/doc-html-skill.git"
+  },
+  "homepage": "https://github.com/manykarim/doc-html-skill#readme",
+  "keywords": ["claude", "claude-code", "agent-skills", "documentation", "html", "mermaid", "wcag"],
+  "bin": {
+    "doc-html-skill": "bin/cli.mjs"
+  },
+  "files": [
+    ".claude/skills/render-branded-html",
+    ".claude/skills/validate-branded-doc",
+    ".claude/skills/review-doc-orchestrator",
+    ".claude/skills/architecture-review-doc",
+    ".claude/skills/user-story-review-doc",
+    ".claude/skills/prd-review-doc",
+    ".claude/skills/risk-analysis-review-doc",
+    ".claude/skills/test-charter-review-doc",
+    "bin",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "validate:mermaid": "node .claude/skills/validate-branded-doc/scripts/validate_mermaid.mjs",
+    "validate:a11y": "node .claude/skills/validate-branded-doc/scripts/validate_accessibility.mjs",
+    "validate:responsive": "node .claude/skills/validate-branded-doc/scripts/validate_responsive.mjs",
+    "validate:export": "node .claude/skills/validate-branded-doc/scripts/validate_export.mjs"
+  },
+  "devDependencies": {
+    "@axe-core/playwright": "^4.9.0",
+    "@mermaid-js/mermaid-cli": "^11.0.0",
+    "mermaid": "^11.0.0",
+    "playwright": "^1.40.0"
+  }
+}

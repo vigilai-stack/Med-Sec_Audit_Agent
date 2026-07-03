@@ -1,0 +1,149 @@
+/*
+ * skins/docs-site.css — Stripe/Mintlify-style docs layout.
+ * Sticky TOC sidebar + top brand bar; sections separated by whitespace and
+ * headings rather than heavy card chrome. Pairs with templates/skins/docs-site.html.j2.
+ */
+
+/* ── top brand bar ─────────────────────────────────────────── */
+.topbar {
+  position: sticky;
+  top: 0;
+  z-index: 40;
+  background: color-mix(in srgb, var(--color-surface) 92%, transparent);
+  backdrop-filter: blur(8px);
+  border-bottom: 1px solid var(--color-line);
+}
+.topbar-inner {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px var(--space-page-x);
+}
+.brand-mark {
+  width: 28px; height: 28px;
+  border-radius: 8px;
+  background: linear-gradient(135deg, var(--color-primary), var(--color-accent));
+  display: grid;
+  place-items: center;
+  color: #fff;
+  font-weight: 800;
+  font-size: 14px;
+}
+.topbar .crumb { color: var(--color-text-dim); font-size: 0.86rem; }
+.topbar .crumb b { color: var(--color-text); font-weight: 600; }
+.topbar .spacer { flex: 1; }
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 3px 11px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 700;
+}
+.pill .dot { width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+.pill--draft     { background: var(--color-warning-soft); color: var(--color-warning); }
+.pill--in-review { background: var(--color-info-soft);    color: var(--color-info); }
+.pill--approved  { background: var(--color-success-soft); color: var(--color-success); }
+.pill--archived  { background: var(--color-neutral-soft); color: var(--color-neutral); }
+
+/* ── shell: sticky TOC + content ───────────────────────────── */
+.shell {
+  max-width: 1280px;
+  margin: 0 auto;
+  display: grid;
+  grid-template-columns: 240px minmax(0, 1fr);
+  gap: 48px;
+  padding: 0 var(--space-page-x);
+}
+@media (max-width: 920px) {
+  .shell { grid-template-columns: minmax(0, 1fr); }
+  .toc { display: none; }
+}
+.toc {
+  position: sticky;
+  top: 64px;
+  align-self: start;
+  padding: 32px 0;
+  font-size: 0.88rem;
+  max-height: calc(100vh - 64px);
+  overflow: auto;
+}
+.toc-label {
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  font-size: 0.7rem;
+  font-weight: 700;
+  color: var(--color-text-dim);
+  margin: 0 0 10px;
+}
+.toc a {
+  display: block;
+  color: var(--color-text-dim);
+  text-decoration: none;
+  padding: 6px 14px;
+  border-left: 2px solid var(--color-line);
+}
+.toc a:hover {
+  color: var(--color-text);
+  border-left-color: var(--color-line-strong);
+}
+.content { padding: 32px 0 96px; min-width: 0; max-width: 860px; }
+
+/* ── hero ──────────────────────────────────────────────────── */
+.eyebrow {
+  margin: 0 0 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.12em;
+  font-size: 0.74rem;
+  font-weight: 700;
+  color: var(--color-primary-strong);
+}
+.hero h1 { margin: 0 0 6px; font-size: 2.2rem; }
+.hero .lead { margin: 0 0 18px; color: var(--color-text-dim); font-size: 1.15rem; max-width: 60ch; }
+.meta-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 26px;
+  padding: 14px 0;
+  border-top: 1px solid var(--color-line);
+  border-bottom: 1px solid var(--color-line);
+  font-size: 0.88rem;
+}
+.meta-grid .kv { display: flex; gap: 7px; }
+.meta-grid .k { color: var(--color-text-dim); }
+.meta-grid .v { font-weight: 600; }
+
+/* ── summary ───────────────────────────────────────────────── */
+.summary { margin: 26px 0 8px; }
+.summary h2 { font-size: 1.05rem; margin: 0 0 12px; }
+
+/* ── sections: heading-led, whitespace-separated ───────────── */
+.section { margin-top: 44px; }
+.section h2 {
+  font-size: 1.4rem;
+  margin: 0 0 16px;
+  scroll-margin-top: 84px;
+  position: relative;
+}
+.section h2 .anchor {
+  opacity: 0;
+  position: absolute;
+  left: -24px;
+  color: var(--color-primary);
+  text-decoration: none;
+  font-weight: 400;
+}
+.section h2:hover .anchor, .section h2 .anchor:focus-visible { opacity: 1; }
+
+/* ── evidence ──────────────────────────────────────────────── */
+.evidence {
+  margin-top: 48px;
+  border: 1px dashed var(--color-line-strong);
+  border-radius: var(--radius-card);
+  padding: 20px 24px;
+  background: var(--color-surface);
+}
+.evidence h2 { margin: 0 0 12px; font-size: 1.05rem; }

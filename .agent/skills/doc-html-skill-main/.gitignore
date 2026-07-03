@@ -1,0 +1,31 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+
+# Node
+node_modules/
+
+# Build artifacts (canonical source is the source of truth; HTML/PDF are generated)
+build/
+*.validate.html
+
+# Distribution artifacts
+dist/
+*.tgz
+*.egg-info/
+
+# Raw benchmark run transcripts (aggregated results in bench/results stay public)
+bench/runs/
+
+# Local agent-tool configs (the public skill set lives in .claude/skills)
+.kilocode/
+.opencode/
+.codex/
+
+# Local experiment scratch
+experiments/pptr.json
+
+# Claude Code local state (never publish; .claude/skills + commands ARE the product)
+.claude/settings.local.json
+CLAUDE.local.md

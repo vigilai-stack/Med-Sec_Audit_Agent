@@ -1,0 +1,53 @@
+# ============================================================================
+# CORE DEPENDENCIES
+# ============================================================================
+pandas>=2.0.0
+numpy>=2.0.0
+matplotlib>=3.9.0
+seaborn>=0.13.0
+scikit-learn>=1.6.0
+openpyxl>=3.1.0
+python-dotenv>=1.0.0
+pyyaml>=6.0.2
+fastapi>=0.124.1
+uvicorn>=0.34.0
+mcp>=1.23.0
+requests>=2.32.4,<2.33.0
+python-dateutil>=2.8.2
+pytz>=2020.1
+tzdata>=2022.7
+faker>=18.0.0
+plotly>=5.20.0
+
+# ============================================================================
+# HYBRID RAG + WEB SEARCH DEPENDENCIES
+# ============================================================================
+langchain>=0.3.0
+langchain-core>=0.3.0
+langchain-text-splitters>=0.3.0
+langchain-community>=0.3.0
+langchain-huggingface>=0.3.0
+faiss-cpu>=1.8.0
+rank-bm25>=0.2.2
+sentence-transformers>=3.0.0
+huggingface-hub>=0.20.0
+beautifulsoup4>=4.12.0
+pypdf>=4.0.0
+python-pptx>=0.6.23
+python-docx>=1.1.0
+sentence-transformers>=3.0   # for cross-encoder reranker (optional)
+duckduckgo-search>=6.0      
+tavily-python>=0.3           # for better web search but needs API key (optional)
+
+# ============================================================================
+# REPORT GENERATION DEPENDENCIES
+# ============================================================================
+python-docx>=1.1.0
+reportlab>=4.0.0
+weasyprint>=61.0
+
+# ============================================================================
+# GUI
+# ============================================================================
+streamlit>=1.36.0
+pyngrok>=7.0.0

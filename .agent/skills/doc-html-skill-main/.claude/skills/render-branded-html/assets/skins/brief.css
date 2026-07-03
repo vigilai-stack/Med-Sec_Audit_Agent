@@ -1,0 +1,94 @@
+/*
+ * skins/brief.css — executive dashboard brief.
+ * Gradient hero, bento card grid (12 columns, width hints), soft shadows.
+ * Pairs with templates/skins/brief.html.j2.
+ */
+
+.wrap { max-width: 1120px; margin: 0 auto; padding: 28px var(--space-page-x) 96px; }
+
+/* ── gradient hero ─────────────────────────────────────────── */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: calc(var(--radius-card) + 6px);
+  padding: 44px 44px 40px;
+  color: #fff;
+  background: linear-gradient(120deg, color-mix(in srgb, var(--color-primary) 70%, #000) 0%, var(--color-primary) 55%, var(--color-accent) 100%);
+  margin-bottom: 20px;
+}
+.hero::after {
+  content: "";
+  position: absolute;
+  right: -120px; top: -120px;
+  width: 380px; height: 380px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255,255,255,.14), transparent 70%);
+}
+.hero .eyebrow {
+  margin: 0 0 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.3);
+  padding: 4px 14px;
+  border-radius: 999px;
+  font-size: 0.76rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+.hero h1 { margin: 0 0 8px; font-size: 2.6rem; }
+.hero .lead { margin: 0 0 20px; font-size: 1.15rem; color: rgba(255,255,255,.92); max-width: 58ch; }
+.hero .chips { display: flex; flex-wrap: wrap; gap: 8px; position: relative; }
+.chip {
+  background: rgba(255,255,255,.14);
+  border: 1px solid rgba(255,255,255,.28);
+  padding: 4px 13px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+}
+.chip b { font-weight: 700; }
+
+/* ── bento grid ────────────────────────────────────────────── */
+.bento { display: grid; grid-template-columns: repeat(12, 1fr); gap: 14px; }
+.bcard {
+  background: var(--color-surface);
+  border-radius: var(--radius-card);
+  padding: 24px;
+  box-shadow: 0 1px 2px rgba(16,24,40,.04), 0 4px 16px -4px rgba(16,24,40,.08);
+  min-width: 0;
+}
+.span-12 { grid-column: span 12; }
+.span-6 { grid-column: span 6; }
+@media (max-width: 880px) {
+  .span-6 { grid-column: span 12; }
+}
+.bcard h2 { margin: 0 0 14px; font-size: 1.18rem; }
+
+/* stats inside a bento card read as KPI tiles */
+.stat { background: var(--color-bg); border: 0; }
+.stat-value { font-size: 1.8rem; font-weight: 800; }
+
+/* cards nested in a bento card: tighter, flatter */
+.cards { gap: 12px; }
+.card-item {
+  border-radius: var(--radius-control);
+  background: linear-gradient(180deg, var(--color-bg), var(--color-surface));
+}
+
+/* evidence chips */
+.evidence { border: 0; }
+.ev-chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.ev-chips a {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: var(--color-primary-soft);
+  color: var(--color-primary-strong);
+  font-weight: 600;
+  font-size: 0.84rem;
+  text-decoration: none;
+  padding: 7px 15px;
+  border-radius: 999px;
+}

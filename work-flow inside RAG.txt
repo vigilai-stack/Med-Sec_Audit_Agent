@@ -1,0 +1,11 @@
+work-flow inside RAG:
+
+Source Documents (read-only)        Processing             FAISS Index (output)
+─────────────────────────────     ───────────────        ────────────────────────
+knowledge_base/documents/    ──►   Extract text    ──►    vector_store/faiss_index/
+├── HIPAA_documentation/           Chunk & embed            ├── index.faiss
+├── FDA_regulations/               Store vectors            ├── index.pkl (metadata)
+├── cybersecurity_framework/
+├── clinical_knowledge/
+├── internal_knowledge/
+└── medical_knowledge/

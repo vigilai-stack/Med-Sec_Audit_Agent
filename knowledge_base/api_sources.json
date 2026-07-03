@@ -1,0 +1,66 @@
+[
+    {
+        "name": "PubMed - HIPAA Compliance",
+        "type": "pubmed",
+        "query": "HIPAA compliance healthcare data security",
+        "max_results": 10,
+        "api_key": ""
+    },
+    {
+        "name": "PubMed - Medical Device Cybersecurity",
+        "type": "pubmed",
+        "query": "medical device cybersecurity healthcare",
+        "max_results": 10,
+        "api_key": ""
+    },
+    {
+        "name": "openFDA - Device Recalls",
+        "type": "openfda",
+        "endpoint": "device/recall",
+        "search": "",
+        "limit": 20,
+        "api_key": ""
+    },
+    {
+        "name": "ClinicalTrials.gov - Healthcare Security",
+        "type": "clinical_trials",
+        "condition": "healthcare cybersecurity",
+        "max_results": 10
+    },
+    {
+        "name": "RxNorm - Aspirin",
+        "type": "rxnorm",
+        "query": "aspirin",
+        "max_results": 25
+    },
+    {
+        "name": "RxNorm - Metformin",
+        "type": "rxnorm",
+        "query": "metformin",
+        "max_results": 25
+    },
+    {
+        "name": "DailyMed - Aspirin Labels",
+        "type": "dailymed",
+        "query": "aspirin",
+        "max_results": 20
+    },
+    {
+        "name": "DailyMed - Insulin Labels",
+        "type": "dailymed",
+        "query": "insulin",
+        "max_results": 20
+    },
+    {
+        "name": "MedlinePlus - HIPAA",
+        "type": "medlineplus",
+        "query": "HIPAA",
+        "max_results": 20
+    },
+    {
+        "name": "MedlinePlus - Health Services Administration",
+        "type": "medlineplus",
+        "query": "health services administration",
+        "max_results": 20
+    }
+]

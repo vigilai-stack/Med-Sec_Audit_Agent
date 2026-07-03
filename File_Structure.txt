@@ -1,0 +1,48 @@
+Google Drive Project Folder/
+├── 📁 Data/
+│   ├── patient_records.csv              # Real patient data
+│   └── payloads.csv                     # Attack payloads
+│                 
+├── 📁 knowledge_base/                   # RAG Knowledge Base
+│   ├── 📁 documents     
+│   │    ├── 📁 HIPAA_documentation/
+│   │    ├── 📁 cybersecurity_framework/
+│   │    ├── 📁 FDA_regulations/
+│   │    ├── 📁 clinical_knowledge/
+│   │    ├── 📁 medical_knowledge/    
+│   │    └── 📁 internal_knowledge/   
+│   │    
+│   └── 📁 vector_store/
+│ 
+├── 📁 .agents/
+│   └── 📁 skills/                       # Agent Skills
+│       ├── 📁 healthcare-cdss-patterns/
+│       ├── 📁 healthcare-emr-patterns/
+│       ├── 📁 healthcare-eval-harness/
+│       ├── 📁 healthcare-phi-compliance/
+│       └── 📁 hipaa-compliance/
+│
+├── 📁 src/                              # Source Code
+│   ├── config.py
+│   ├── mcp_server.py
+│   ├── agents.py
+│   ├── orchestrator.py
+│   ├── rag_agent.py
+│   ├── rag_loader.py
+│   └── report_agent.py
+│
+├── 📁 medsec_sandbox/                   # Runtime Workspace
+│   ├── 📁 logs/
+│   ├── 📁 reports/
+│   ├── 📁 crypto/
+│   ├── 📁 quarantine/
+│   └── 📁 tmp/
+│
+├── medsec_audit_agent.ipynb             # Main Jupyter Notebook
+├── config.yaml                          # Configuration
+├── requirements.txt                     # Dependencies
+├── .env                                 # Environment Variables
+│                   
+└── File_Structure.txt                   # File structure in gdrive
+
+                               # Environment Variables

@@ -1,0 +1,16 @@
+sequenceDiagram
+  actor Eng as Engineer
+  participant AI as AI agent
+  participant MCP as rf-mcp
+  participant RF as Live RF context
+  Eng->>AI: Describe the test in plain words
+  AI->>MCP: analyze_scenario + recommend_libraries
+  MCP-->>AI: A plan and the right libraries
+  loop Build it step by step
+    AI->>MCP: execute_step
+    MCP->>RF: Run the keyword in a live context
+    RF-->>MCP: Result, page source, state
+    MCP-->>AI: Feedback for the next move
+  end
+  AI->>MCP: build_test_suite
+  MCP-->>Eng: A clean .robot suite

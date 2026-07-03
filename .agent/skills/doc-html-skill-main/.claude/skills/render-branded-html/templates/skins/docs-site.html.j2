@@ -1,0 +1,75 @@
+{# skins/docs-site.html.j2 — Stripe/Mintlify-style docs layout.
+   Sticky TOC sidebar + top brand bar. Default skin for architecture-review
+   and test-charter. All chrome owned here; content via shared widget macros. #}
+{% import "widgets.html.j2" as w %}
+<!doctype html>
+<html lang="en"{% if artifact.theme and artifact.theme.mode %} data-theme-mode="{{ artifact.theme.mode }}"{% endif %}>
+<head>
+  <meta charset="utf-8">
+  <title>{{ artifact.title }}</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+{{ theme_vars_css | safe }}
+{{ base_css | safe }}
+{{ skin_css | safe }}
+@media print {
+{{ print_css | safe }}
+}
+  </style>
+</head>
+<body class="skin-docs-site">
+  <div class="topbar">
+    <div class="topbar-inner">
+      <div class="brand-mark" aria-hidden="true">{{ (artifact.owner or artifact.title)[:1] | upper }}</div>
+      <span class="crumb">{{ artifact.artifact_type | replace("-", " ") }}&nbsp;/&nbsp;<b>{{ artifact.title }}</b></span>
+      <span class="spacer"></span>
+      {% if artifact.status %}<span class="pill pill--{{ artifact.status }}"><span class="dot" aria-hidden="true"></span>{{ artifact.status }}</span>{% endif %}
+      {% if artifact.updated_at %}<span class="crumb">Updated {{ artifact.updated_at }}</span>{% endif %}
+    </div>
+  </div>
+
+  <div class="shell">
+    <nav class="toc" aria-label="On this page">
+      <p class="toc-label">On this page</p>
+      {% for section in sections %}
+      <a href="#{{ section.id }}">{{ section.title }}</a>
+      {% endfor %}
+      {% if artifact.evidence %}<a href="#evidence">Evidence</a>{% endif %}
+    </nav>
+
+    <main class="content">
+      <header class="hero">
+        <p class="eyebrow">{{ artifact.artifact_type | replace("-", " ") }}</p>
+        <h1>{{ artifact.title }}</h1>
+        {% if artifact.subtitle %}<p class="lead">{{ artifact.subtitle }}</p>{% endif %}
+        <div class="meta-grid">
+          {% if artifact.owner %}<span class="kv"><span class="k">Owner</span><span class="v">{{ artifact.owner }}</span></span>{% endif %}
+          {% if artifact.audience %}<span class="kv"><span class="k">Audience</span><span class="v">{{ artifact.audience | join(" · ") }}</span></span>{% endif %}
+          <span class="kv"><span class="k">Schema</span><span class="v">v{{ artifact.schema_version }}</span></span>
+        </div>
+      </header>
+
+      {{ w.summary(artifact) }}
+
+      {% for section in sections %}
+      <section id="{{ section.id }}" class="section section--{{ section.kind }}">
+        <h2><a class="anchor" href="#{{ section.id }}" aria-label="Link to {{ section.title }}">#</a>{{ section.title }}</h2>
+        {{ w.body(section, frozen, frozen_svgs) }}
+      </section>
+      {% endfor %}
+
+      <div id="evidence">{{ w.evidence(artifact) }}</div>
+      {{ w.footer(artifact) }}
+    </main>
+  </div>
+
+  {% if not frozen %}
+  <script type="module">
+{{ mermaid_init | safe }}
+  </script>
+  {% endif %}
+  <script>
+{{ enhance_js | safe }}
+  </script>
+</body>
+</html>

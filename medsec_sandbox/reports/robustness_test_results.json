@@ -1,0 +1,24 @@
+{
+  "pass": [
+    "PHI Detection: Patient: John Doe SSN: 123-45-...",
+    "PHI Detection: Contact: jane.doe@hospital.com...",
+    "PHI Detection: MRN-987654, 555-123-4567, 123 ...",
+    "Input Validation: <script>alert('xss')</script>...",
+    "Input Validation: DROP TABLE patients;...",
+    "Input Validation: ';--...",
+    "Input Validation: Patient name: John Smith...",
+    "Input Validation: SELECT * FROM patients WHERE n...",
+    "Attack Handling: phi_exfiltration",
+    "Attack Handling: prompt_injection",
+    "Attack Handling: privilege_escalation",
+    "Attack Handling: sql_injection",
+    "Attack Handling: path_traversal",
+    "Compliance: ['patient_id', 'diagnosis']",
+    "Full Audit Execution"
+  ],
+  "fail": [
+    "Compliance: ['name', 'ssn']",
+    "Compliance: ['name', 'ssn', 'dob']"
+  ],
+  "error": []
+}

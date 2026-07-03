@@ -1,0 +1,59 @@
+# ═══════════════════════════════════════════════════════════════════════
+# Web URLs for RAG Knowledge Base
+# ═══════════════════════════════════════════════════════════════════════
+# Add one URL per line. Lines starting with # are comments.
+# These pages will be scraped and added to the FAISS index.
+
+# HIPAA Resources
+https://www.hhs.gov/hipaa/for-professionals/security/laws-regulations/index.html
+https://www.hhs.gov/hipaa/for-professionals/privacy/laws-regulations/index.html
+https://www.hhs.gov/hipaa/for-professionals/special-topics/breach-notification/index.html
+https://www.hhs.gov/hipaa/for-professionals/privacy/guidance/access/index.html
+https://www.hhs.gov/sites/default/files/ocr/privacy/hipaa/model/notice-privacy-practices/notice-of-privacy-practices-english-auth.pdf
+
+# NIST Cybersecurity
+https://www.nist.gov/cyberframework
+https://csrc.nist.gov/projects/risk-management
+https://csrc.nist.gov/pubs/sp/800/53/r5/upd1/final
+https://csrc.nist.gov/pubs/sp/800/171/r2/upd1/final
+https://www.nist.gov/healthcare
+
+# FDA Medical Device Cybersecurity
+https://www.fda.gov/medical-devices/digital-health-center-excellence/cybersecurity
+https://www.fda.gov/medical-devices/digital-health-center-excellence/software-medical-device-samd
+https://www.fda.gov/medical-devices/device-software-cybersecurity-network-connected-capability/qms-cybersecurity
+https://www.fda.gov/medical-devices/premarket-submissions-selecting-premarket-submission-type-manufacturer-medical-device
+https://www.fda.gov/regulatory-information/search-fda-guidance-documents
+https://www.fda.gov/medical-devices/cybersecurity
+
+# CMS / Medicare
+https://www.cms.gov/Medicare/Coding/ICD10
+https://www.cms.gov/Medicare/Coding/ICD10/Downloads/2019-ICD-10-CM-Code-Tables.zip
+https://www.cms.gov/medicare/quality-initiatives-patient-assessment-instruments/hospital-quality-reporting
+https://www.cms.gov/regulations-and-guidance/regulations-index
+
+# Clinical Trials
+https://clinicaltrials.gov/ct2/about-studies
+https://clinicaltrials.gov/ct2/manage-recs/background
+https://www.fda.gov/science-research/clinical-trials-and-human-subject-protection/regulatory-information-clinical-trials
+
+# Medical Journals & References
+https://www.ncbi.nlm.nih.gov/pmc/about/
+https://www.ncbi.nlm.nih.gov/pmc/articles/PMC9366344/
+https://www.nlm.nih.gov/
+https://ghr.nlm.nih.gov/
+https://www.cdc.gov/healthcommunication/index.html
+
+# Cybersecurity in Healthcare
+https://www.cisa.gov/healthcare-and-public-health
+https://healthit.gov/topic/privacy-security-and-hipaa
+https://www.hhs.gov/about/news/2024/12/06/hhs-finalizes-cybersecurity-practice-standards.html
+
+# ICD-10 / Coding
+https://www.icd10data.com/ICD10CM/Codes
+https://www.ahima.org/topics/icd-10-cm
+
+# Medical Billing & RCM
+https://www.ama-assn.org/practice-management/coding-billing-insurance
+https://www.aapc.com/resources/medical-coding/
+https://www.hfma.org/topics/coding-billing-revenue-cycle
