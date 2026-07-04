@@ -1,6 +1,6 @@
 # Kaggle Capstone Project - June 2026
 
-## Orchestrator Supervisor for Clinical Trial Audit Pipeline
+## Orchestrator Supervisor for Healthcare Data Security & Compliance Audit Pipeline
 
 ### Project Overview
 This project implements an automated audit pipeline with five phases:
