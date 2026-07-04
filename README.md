@@ -1,6 +1,7 @@
 # Kaggle Capstone Project - June 2026
+### (AI-Powered Healthcare Data Security & Compliance Multi-Agent Auditor)
 
-## Orchestrator Supervisor for Healthcare Data Security & Compliance Audit Pipeline
+## Anomaly Detection in EHR Access Logs | Red/Blue/Green Team Architecture for HIPAA Compliance
 
 ### Project Overview
 This project implements an automated audit pipeline with five phases:
