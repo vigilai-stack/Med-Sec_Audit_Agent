@@ -1,3 +1,0 @@
-"""
-Markdown to IPYNB tool
-"""
