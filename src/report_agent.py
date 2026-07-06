@@ -61,6 +61,8 @@ class ReportGenerationAgent:
     INK    = "#172033"
     MUTED  = "#667085"
     WHITE  = "#FFFFFF"
+    LIGHT_GOLD = "#F5E6B8"
+    LIGHT_TEAL = "#BDE7E3"
 
     def __init__(self, workspace_dir: str = "./medsec_sandbox", skills_path: str = None):
         self.workspace = workspace_dir
@@ -332,20 +334,34 @@ class ReportGenerationAgent:
             return None
 
     def _create_threat_heatmap(self) -> Optional[str]:
+        """Create threat analysis heatmap — large size for maximum readability"""
         try:
             red_results = self.report_data.get("red_team", {}).get("results", {})
             if not red_results:
                 return None
-            fig, ax = plt.subplots(figsize=(8, 3))  # Reduced height from 4 to 3
+            
+            # Large size for excellent readability
+            fig, ax = plt.subplots(figsize=(11, 5.5))
             attack_names = list(red_results.keys())
             attempts = [red_results[a].get("total_attempts", 0) for a in attack_names]
             successful = [red_results[a].get("successful_attacks", 0) for a in attack_names]
             failed = [a - s for a, s in zip(attempts, successful)]
+            
             df = pd.DataFrame({"Attack Type": attack_names, "Successful": successful, "Failed": failed})
             df = df.set_index("Attack Type")
-            sns.heatmap(df.T, annot=True, fmt="d", cmap="RdYlGn_r", ax=ax, cbar_kws={"label": "Count"})
-            ax.set_title("Threat Analysis Heatmap")
+            
+            # Create heatmap with better formatting
+            sns.heatmap(df.T, annot=True, fmt="d", cmap="RdYlGn_r", ax=ax, 
+                       cbar_kws={"label": "Count", "shrink": 0.7},
+                       annot_kws={"size": 12, "weight": "bold"})
+            ax.set_title("Threat Analysis Heatmap", fontsize=14, fontweight="bold", pad=15)
+            
+            # Rotate x-axis labels for better readability
+            ax.set_xticklabels(ax.get_xticklabels(), rotation=15, ha="right", fontsize=11)
+            ax.set_yticklabels(ax.get_yticklabels(), fontsize=11)
+            
             plt.tight_layout()
+            
             path = os.path.join(self.reports_dir, "threat_heatmap.png")
             plt.savefig(path, dpi=150, bbox_inches="tight")
             plt.close()
@@ -521,6 +537,8 @@ class ReportGenerationAgent:
         soft_c = colors.HexColor(self.SOFT)
         line_c = colors.HexColor(self.LINE)
         ink_c = colors.HexColor(self.INK)
+        light_gold_c = colors.HexColor(self.LIGHT_GOLD)
+        light_teal_c = colors.HexColor(self.LIGHT_TEAL)
 
         path = os.path.join(self.reports_dir, "audit_report.pdf")
         doc = SimpleDocTemplate(
@@ -533,8 +551,14 @@ class ReportGenerationAgent:
 
         # ── Styles ──────────────────────────────────────────────────────────
         styles = getSampleStyleSheet()
-        styles.add(ParagraphStyle(name="CoverTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=28, leading=32, textColor=colors.white, alignment=TA_CENTER, spaceAfter=14))
-        styles.add(ParagraphStyle(name="CoverSub", parent=styles["BodyText"], fontSize=13, leading=17, textColor=colors.HexColor("#BDE7E3"), alignment=TA_CENTER, spaceAfter=12))
+        
+        # Cover styles
+        styles.add(ParagraphStyle(name="CoverTitle", parent=styles["Title"], fontName="Helvetica-Bold", fontSize=26, leading=30, textColor=colors.white, alignment=TA_CENTER, spaceAfter=6))
+        styles.add(ParagraphStyle(name="CoverSub", parent=styles["BodyText"], fontSize=13, leading=16, textColor=light_teal_c, alignment=TA_CENTER, spaceAfter=8))
+        styles.add(ParagraphStyle(name="CoverTagline", parent=styles["BodyText"], fontName="Helvetica-Bold", fontSize=12, leading=14, textColor=light_gold_c, alignment=TA_CENTER, spaceAfter=10))
+        styles.add(ParagraphStyle(name="CoverDesc", parent=styles["BodyText"], fontSize=9, leading=11, textColor=light_teal_c, alignment=TA_CENTER, spaceAfter=6))
+        
+        # Body styles
         styles.add(ParagraphStyle(name="Section", parent=styles["Heading1"], fontName="Helvetica-Bold", fontSize=15, leading=18, textColor=navy_c, spaceBefore=7, spaceAfter=6))
         styles.add(ParagraphStyle(name="SubSection", parent=styles["Heading2"], fontName="Helvetica-Bold", fontSize=11.5, leading=14, textColor=teal_c, spaceBefore=5, spaceAfter=4))
         styles.add(ParagraphStyle(name="BodySmall", parent=styles["BodyText"], fontSize=9.2, leading=12.2, textColor=ink_c))
@@ -569,9 +593,10 @@ class ReportGenerationAgent:
                 return None
             try:
                 img = Image(image_path)
-                ratio = min(max_w / img.imageWidth, max_h / img.imageHeight)
-                img.drawWidth = img.imageWidth * ratio
-                img.drawHeight = img.imageHeight * ratio
+                # Use _restrictSize so reportlab knows the exact rendered dimensions
+                # during the wrapping/layout phase — this prevents blank-page gaps.
+                img._restrictSize(max_w, max_h)
+                img.hAlign = 'CENTER'
                 return img
             except Exception:
                 return None
@@ -591,30 +616,34 @@ class ReportGenerationAgent:
         cover_title = Table(
             [
                 [Paragraph(_esc_html(str(institution)), styles["CoverTitle"])],
-                [Paragraph("Med-Sec Audit Agent Security Audit Report", styles["CoverSub"])],
-                [Paragraph("DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY.<br/>AND NOW, IT IS AUTOMATED.", ParagraphStyle(name="CT", parent=styles["BodyText"], fontName="Helvetica-Bold", fontSize=11.4, leading=14, textColor=colors.white, alignment=TA_CENTER))],
-                [Paragraph("Enterprise AI Security, PHI Protection, and HIPAA-Oriented Audit Package", ParagraphStyle(name="CK", parent=styles["BodyText"], fontSize=8.8, leading=11, textColor=colors.HexColor("#BDE7E3"), alignment=TA_CENTER))],
+                [Paragraph("Med-Sec Audit Agent Security & Compliance Audit Report", styles["CoverSub"])],
+                [Paragraph("(Med-Sec Audit Agent: AI-Powered Healthcare Clinical Data Security & Compliance Auditor)", styles["CoverDesc"])],
+                [Spacer(1, 4)],
+                [Paragraph("DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY.<br/>AND NOW, IT IS AUTOMATED.", styles["CoverTagline"])],
+                [Spacer(1, 4)],
+                [Paragraph("TARGET SYSTEM: Healthcare Clinical Data Documentation System (EHR)", styles["CoverDesc"])],
             ],
             colWidths=[6.8 * inch],
-            rowHeights=[0.58 * inch, 0.27 * inch, 0.42 * inch, 0.22 * inch],
+            rowHeights=[0.55 * inch, 0.28 * inch, 0.20 * inch, 0.06 * inch, 0.35 * inch, 0.06 * inch, 0.22 * inch],
         )
         cover_title.setStyle(TableStyle([
             ("BACKGROUND", (0, 0), (-1, -1), navy_c),
             ("BOX", (0, 0), (-1, -1), 0, navy_c),
             ("LEFTPADDING", (0, 0), (-1, -1), 24),
             ("RIGHTPADDING", (0, 0), (-1, -1), 24),
-            ("TOPPADDING", (0, 0), (-1, -1), 12),
-            ("BOTTOMPADDING", (0, 0), (-1, -1), 8),
+            ("TOPPADDING", (0, 0), (-1, -1), 16),
+            ("BOTTOMPADDING", (0, 0), (-1, -1), 12),
+            ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
         story.append(cover_title)
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 8))
 
         # ── Cover Meta Card ─────────────────────────────────────────────────
         cl = ParagraphStyle(name="CL", parent=styles["BodyText"], fontSize=7.8, leading=9.5, textColor=colors.HexColor("#5A6B7D"), spaceAfter=1)
         cv = ParagraphStyle(name="CV", parent=styles["BodyText"], fontName="Helvetica-Bold", fontSize=10.2, leading=12.5, textColor=navy_c)
         cover_meta = [
             [Paragraph("REPORT DATE", cl), Paragraph("TARGET SYSTEM", cl)],
-            [Paragraph(_esc_html(str(report_date)), cv), Paragraph(_esc_html(str(target)), cv)],
+            [Paragraph(_esc_html(str(report_date)), cv), Paragraph(_esc_html("Healthcare Clinical Data Documentation System (EHR)"), cv)],
             [Paragraph("AUDIT ID", cl), Paragraph("GENERATED BY", cl)],
             [Paragraph(_esc_html(str(data.get("audit_id", "N/A"))), cv), Paragraph("Med-Sec Audit Agent (<b>PHI Guardians</b>)", cv)],
         ]
@@ -631,7 +660,7 @@ class ReportGenerationAgent:
             ("LINEBEFORE", (1, 0), (1, -1), 1.2, teal_c),
         ]))
         story.append(meta_card)
-        story.append(Spacer(1, 10))
+        story.append(Spacer(1, 8))
 
         # ── Scope Strip ─────────────────────────────────────────────────────
         scope_tile = ParagraphStyle(name="ST", parent=styles["BodyText"], alignment=TA_CENTER, fontName="Helvetica-Bold", fontSize=13.2, leading=15, textColor=colors.white)
@@ -648,7 +677,7 @@ class ReportGenerationAgent:
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
         story.append(scope_strip)
-        story.append(Spacer(1, 14))
+        story.append(Spacer(1, 10))
 
         # ── Executive Summary ───────────────────────────────────────────────
         story.append(Paragraph("Executive Summary", styles["Section"]))
@@ -660,7 +689,7 @@ class ReportGenerationAgent:
             f"<b>{compliance.get('score', 0):.1f}%</b>.",
             styles["BodySmall"],
         ))
-        story.append(Spacer(1, 6))
+        story.append(Spacer(1, 4))
 
         # ── Metric Cards ────────────────────────────────────────────────────
         metric_data = [[
@@ -684,7 +713,7 @@ class ReportGenerationAgent:
             ("INNERGRID", (0, 0), (-1, -1), 3, colors.white),
             ("VALIGN", (0, 0), (-1, -1), "MIDDLE"),
         ]))
-        story += [metric_table, Spacer(1, 9)]
+        story += [metric_table, Spacer(1, 4)]
 
         # ── Processing Scope ────────────────────────────────────────────────
         story.append(Paragraph("Processing Scope", styles["Section"]))
@@ -695,7 +724,7 @@ class ReportGenerationAgent:
             [para("PHI elements identified/masked"), para(phi.get("original_phi_count", 0))],
             [para("Compliance checks passed"), para(f"{comp_details.get('passed_checks', 0)}/{comp_details.get('total_checks', 0)}")],
         ]
-        story += [styled_table(scope, [2.15 * inch, 4.45 * inch]), Spacer(1, 8)]
+        story += [styled_table(scope, [2.15 * inch, 4.45 * inch]), Spacer(1, 4)]
 
         # ── Security Team Assessment ─────────────────────────────────────────
         story.append(Paragraph("Security Team Assessment", styles["Section"]))
@@ -705,32 +734,43 @@ class ReportGenerationAgent:
             [para("Blue Team"), para("Runtime detection of suspicious instructions, anomalous inputs, policy violations."), para(f"{blue.get('threat_count', 0)} threats detected; risk level {blue.get('risk_level', 'LOW')}.")],
             [para("Green Team"), para("Automated remediation actions and control hardening."), para(f"{green.get('fixes_applied', 0)} remediation actions documented.")],
         ]
-        story += [styled_table(team_rows, [1.15 * inch, 3.25 * inch, 2.2 * inch]), Spacer(1, 8)]
+        story += [styled_table(team_rows, [1.15 * inch, 3.25 * inch, 2.2 * inch]), Spacer(1, 4)]
 
-        # ── Visual Evidence ──────────────────────────────────────────────────
-        story.append(Paragraph("Visual Evidence", styles["Section"]))
-        charts = [
-            ("Risk Level Chart", "risk_chart"),
-            ("Attack Success Rate Chart", "attack_chart"),
-            ("Compliance Dashboard", "compliance_dashboard"),
-            ("Team Summary Chart", "team_summary"),
-            ("Threat Heatmap", "threat_heatmap"),
-        ]
-        for title, key in charts:
-            img = image_flowable(visuals.get(key, ""), max_w=6.1 * inch, max_h=2.2 * inch if key != "threat_heatmap" else 1.5 * inch)
-            if img:
-                story += [Paragraph(title, styles["SubSection"]), img, Spacer(1, 6)]
-
+        # ── Visual Evidence — starts on a fresh page ────────────────────────
         story.append(PageBreak())
+        story.append(Paragraph("Visual Evidence", styles["Section"]))
+        story.append(Spacer(1, 2))
 
-        # ── Red Team Detail ──────────────────────────────────────────────────
+        # First four small charts flow together on this page
+        small_charts = [
+            ("Risk Level Chart", "risk_chart", 5.5 * inch, 1.6 * inch),
+            ("Attack Success Rate Chart", "attack_chart", 5.5 * inch, 1.6 * inch),
+            ("Compliance Dashboard", "compliance_dashboard", 5.5 * inch, 1.6 * inch),
+            ("Team Summary Chart", "team_summary", 5.5 * inch, 1.6 * inch),
+        ]
+        for title, key, width, height in small_charts:
+            img = image_flowable(visuals.get(key, ""), max_w=width, max_h=height)
+            if img:
+                story.append(Paragraph(title, styles["SubSection"]))
+                story.append(img)
+                story.append(Spacer(1, 2))
+
+        # ── Threat Heatmap — pushed to its own fresh page ────────────────────
+        story.append(PageBreak())
+        heatmap_img = image_flowable(visuals.get("threat_heatmap", ""), max_w=6.5 * inch, max_h=2.8 * inch)
+        if heatmap_img:
+            story.append(Paragraph("Threat Heatmap", styles["SubSection"]))
+            story.append(heatmap_img)
+            story.append(Spacer(1, 2))
+
+        # ── Red Team Detail — follows immediately on the same page ───────────
         story.append(Paragraph("Red Team Attack Detail", styles["Section"]))
         red_rows = [[para("Attack Type", "WhiteCell"), para("Attempts", "WhiteCell"), para("Successful", "WhiteCell"), para("Success Rate", "WhiteCell")]]
         for atk, d in red_results.items():
             red_rows.append([para(atk.replace("_", " ").title()), para(d.get("total_attempts", 0)), para(d.get("successful_attacks", 0)), para(f"{d.get('success_rate', 0) * 100:.1f}%")])
         if len(red_rows) == 1:
             red_rows.append([para("No attacks recorded"), para(0), para(0), para("0.0%")])
-        story += [styled_table(red_rows, [2.65 * inch, 1.2 * inch, 1.2 * inch, 1.35 * inch]), Spacer(1, 5)]
+        story += [styled_table(red_rows, [2.65 * inch, 1.2 * inch, 1.2 * inch, 1.35 * inch]), Spacer(1, 4)]
 
         # ── Compliance & Remediation ─────────────────────────────────────────
         story.append(Paragraph("Compliance And Remediation", styles["Section"]))
@@ -741,19 +781,19 @@ class ReportGenerationAgent:
             [para("Checks passed"), para(f"{comp_details.get('passed_checks', 0)}/{comp_details.get('total_checks', 0)}")],
             [para("Compliance status"), para("COMPLIANT" if comp_details.get("compliant", False) else "NON-COMPLIANT")],
         ]
-        story += [styled_table(comp_rows, [2.15 * inch, 4.45 * inch]), Spacer(1, 4)]
+        story += [styled_table(comp_rows, [2.15 * inch, 4.45 * inch]), Spacer(1, 3)]
 
         issues = comp_details.get("issues", []) or ["No compliance issues recorded."]
         story.append(Paragraph("Issues Found", styles["SubSection"]))
         for issue in issues:
             story.append(Paragraph(f"- {_esc_html(str(issue))}", styles["BodySmall"]))
-        story.append(Spacer(1, 5))
+        story.append(Spacer(1, 4))
 
         # ── Recommendations ─────────────────────────────────────────────────
         rec_block = [Paragraph("Priority Recommendations", styles["Section"])]
         for i, rec in enumerate(data.get("recommendations", []) or ["No recommendations recorded."], 1):
             rec_block.append(Paragraph(f"{i}. {_esc_html(str(rec))}", styles["BodySmall"]))
-            rec_block.append(Spacer(1, 3))
+            rec_block.append(Spacer(1, 2))
         story.append(KeepTogether(rec_block))
 
         doc.build(story, onFirstPage=footer, onLaterPages=footer)
@@ -801,16 +841,28 @@ class ReportGenerationAgent:
         title.alignment = WD_ALIGN_PARAGRAPH.CENTER
         title.runs[0].font.color.rgb = RGBColor(0x12, 0x35, 0x5B)
 
-        subtitle = doc.add_paragraph("Med-Sec Audit Agent Security Audit Report")
+        subtitle = doc.add_paragraph("Med-Sec Audit Agent Security & Compliance Audit Report")
         subtitle.alignment = WD_ALIGN_PARAGRAPH.CENTER
         subtitle.runs[0].bold = True
         subtitle.runs[0].font.size = Pt(15)
         subtitle.runs[0].font.color.rgb = RGBColor(0x0B, 0x7A, 0x75)
 
-        tagline = doc.add_paragraph("Data security is not a feature — it is a necessity. And now, it is automated.")
+        subtitle2 = doc.add_paragraph("(Med-Sec Audit Agent: AI-Powered Healthcare Clinical Data Security & Compliance Auditor)")
+        subtitle2.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        subtitle2.runs[0].italic = True
+        subtitle2.runs[0].font.size = Pt(10)
+        subtitle2.runs[0].font.color.rgb = RGBColor(0x66, 0x70, 0x85)
+
+        tagline = doc.add_paragraph("DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY. AND NOW, IT IS AUTOMATED.")
         tagline.alignment = WD_ALIGN_PARAGRAPH.CENTER
-        tagline.runs[0].italic = True
-        tagline.runs[0].font.color.rgb = RGBColor(0x66, 0x70, 0x85)
+        tagline.runs[0].bold = True
+        tagline.runs[0].font.size = Pt(12)
+        tagline.runs[0].font.color.rgb = RGBColor(0xB7, 0x79, 0x1F)
+
+        target_line = doc.add_paragraph("TARGET SYSTEM: Healthcare Clinical Data Documentation System (EHR)")
+        target_line.alignment = WD_ALIGN_PARAGRAPH.CENTER
+        target_line.runs[0].font.size = Pt(10)
+        target_line.runs[0].font.color.rgb = RGBColor(0x66, 0x70, 0x85)
 
         doc.add_paragraph()
 
@@ -819,7 +871,7 @@ class ReportGenerationAgent:
         meta_table.style = "Table Grid"
         meta_items = [
             ("Report Date", str(report_date)),
-            ("Target System", str(target)),
+            ("Target System", "Healthcare Clinical Data Documentation System (EHR)"),
             ("Audit ID", str(data.get("audit_id", "N/A"))),
             ("Audit Timestamp", str(data.get("timestamp", "N/A"))),
             ("Generated By", context.get("prepared_by", "Med-Sec Audit Agent (PHI Guardians)")),
@@ -884,7 +936,9 @@ class ReportGenerationAgent:
             img_path = visuals.get(key)
             if img_path and os.path.exists(img_path):
                 doc.add_heading(title, level=2)
-                doc.add_picture(img_path, width=Inches(6.3))
+                # Threat heatmap gets larger size
+                width = Inches(6.5) if key == "threat_heatmap" else Inches(6.3)
+                doc.add_picture(img_path, width=width)
 
         # ── Compliance ────────────────────────────────────────────────────────
         doc.add_heading("HIPAA Compliance Validation", level=1)
@@ -1019,7 +1073,7 @@ class ReportGenerationAgent:
         summary_items = [
             ("Institution", context.get("institution_name", "Demo Healthcare Institution")),
             ("Report Date", str(context.get("report_generated_date", ""))),
-            ("Target System", context.get("target_system", "Healthcare Clinical Documentation System")),
+            ("Target System", "Healthcare Clinical Data Documentation System (EHR)"),
             ("Audit ID", data.get("audit_id", "N/A")),
             ("Timestamp", data.get("timestamp", "N/A")),
             ("Duration (seconds)", data.get("duration", 0)),
@@ -1212,9 +1266,11 @@ class ReportGenerationAgent:
         ink = RGBColor(0x17, 0x20, 0x33)
         muted = RGBColor(0x66, 0x70, 0x85)
         soft = RGBColor(0xF5, 0xF7, 0xFA)
+        light_gold = RGBColor(0xF5, 0xE6, 0xB8)
+        light_teal = RGBColor(0xBD, 0xE7, 0xE3)
 
         def add_bg_rect(slide, color, left=0, top=0, width=prs.slide_width, height=prs.slide_height):
-            shape = slide.shapes.add_shape(1, left, top, width, height)  # MSO_SHAPE.RECTANGLE
+            shape = slide.shapes.add_shape(1, left, top, width, height)
             shape.fill.solid()
             shape.fill.fore_color.rgb = color
             shape.line.fill.background()
@@ -1261,11 +1317,13 @@ class ReportGenerationAgent:
         # ── Slide 1: Cover ───────────────────────────────────────────────────
         slide1 = prs.slides.add_slide(blank_layout)
         add_bg_rect(slide1, navy)
-        add_textbox(slide1, Inches(1), Inches(1.5), Inches(11.3), Inches(1.5), str(institution), 36, True, white, PP_ALIGN.CENTER, MSO_ANCHOR.MIDDLE)
-        add_textbox(slide1, Inches(1), Inches(3.2), Inches(11.3), Inches(0.8), "Med-Sec Audit Agent Security Audit Report", 20, False, RGBColor(0xBD, 0xE7, 0xE3), PP_ALIGN.CENTER)
-        add_textbox(slide1, Inches(1), Inches(4.2), Inches(11.3), Inches(0.6), "DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY. AND NOW, IT IS AUTOMATED.", 14, True, white, PP_ALIGN.CENTER)
-        add_textbox(slide1, Inches(1), Inches(5.5), Inches(11.3), Inches(0.4), f"Report Date: {report_date}  |  Target: {target}  |  Audit ID: {data.get('audit_id', 'N/A')}", 12, False, muted, PP_ALIGN.CENTER)
-        add_textbox(slide1, Inches(1), Inches(6.5), Inches(11.3), Inches(0.4), "Prepared by Med-Sec Audit Agent (PHI Guardians)", 11, False, muted, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(1.2), Inches(11.3), Inches(1.3), str(institution), 34, True, white, PP_ALIGN.CENTER, MSO_ANCHOR.MIDDLE)
+        add_textbox(slide1, Inches(1), Inches(2.6), Inches(11.3), Inches(0.7), "Med-Sec Audit Agent Security & Compliance Audit Report", 18, False, light_teal, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(3.3), Inches(11.3), Inches(0.5), "(Med-Sec Audit Agent: AI-Powered Healthcare Clinical Data Security & Compliance Auditor)", 11, False, muted, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(4.2), Inches(11.3), Inches(0.8), "DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY.\nAND NOW, IT IS AUTOMATED.", 14, True, light_gold, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(5.5), Inches(11.3), Inches(0.4), "TARGET SYSTEM: Healthcare Clinical Data Documentation System (EHR)", 12, False, light_teal, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(6.2), Inches(11.3), Inches(0.4), f"Report Date: {report_date}  |  Audit ID: {data.get('audit_id', 'N/A')}", 11, False, muted, PP_ALIGN.CENTER)
+        add_textbox(slide1, Inches(1), Inches(6.8), Inches(11.3), Inches(0.3), "Prepared by Med-Sec Audit Agent (PHI Guardians)", 10, False, muted, PP_ALIGN.CENTER)
 
         # ── Slide 2: Executive Summary ────────────────────────────────────────
         slide2 = prs.slides.add_slide(blank_layout)
@@ -1329,6 +1387,7 @@ class ReportGenerationAgent:
             ("attack_chart", Inches(6.8), Inches(1.1), Inches(6), Inches(2.8)),
             ("compliance_dashboard", Inches(0.5), Inches(4.1), Inches(6), Inches(2.8)),
             ("team_summary", Inches(6.8), Inches(4.1), Inches(6), Inches(2.8)),
+            ("threat_heatmap", Inches(0.5), Inches(6.9), Inches(12), Inches(0.6)),
         ]
         for key, left, top, width, height in chart_images:
             img_path = visuals.get(key)
@@ -1376,7 +1435,7 @@ class ReportGenerationAgent:
         add_textbox(slide9, Inches(1), Inches(3.8), Inches(11.3), Inches(2),
                     "This report provides an executive-ready view of audit scope, adversarial testing, "
                     "detection outcomes, remediation activity, compliance posture, and visual evidence "
-                    "in one self-contained package.", 16, False, RGBColor(0xBD, 0xE7, 0xE3), PP_ALIGN.CENTER)
+                    "in one self-contained package.", 16, False, light_teal, PP_ALIGN.CENTER)
         add_textbox(slide9, Inches(1), Inches(6.5), Inches(11.3), Inches(0.4), "Med-Sec Audit Agent (PHI Guardians) | Confidential", 11, False, muted, PP_ALIGN.CENTER)
 
         path = os.path.join(self.reports_dir, "audit_report.pptx")
@@ -1441,6 +1500,7 @@ class ReportGenerationAgent:
             .page {{ max-width: 980px; margin: 32px auto; background: white; box-shadow: 0 12px 34px rgba(23,32,51,.12); }}
             .cover {{ background: {self.NAVY}; color: white; padding: 34px 42px; border-bottom: 8px solid {self.TEAL}; }}
             .cover h1 {{ margin: 0; font-size: 30px; }} .cover h2 {{ margin: 8px 0 0; color: #BDE7E3; font-weight: 500; }}
+            .cover .tagline {{ color: #F5E6B8; font-weight: bold; font-size: 14px; margin: 10px 0; }}
             .meta-grid {{ display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; margin-top: 22px; }}
             .meta {{ background: rgba(255,255,255,.10); padding: 10px 12px; border-left: 4px solid #BDE7E3; }}
             .content {{ padding: 34px 42px; }} h2 {{ color: {self.NAVY}; margin-top: 28px; border-bottom: 2px solid {self.LINE}; padding-bottom: 7px; }}
@@ -1452,10 +1512,15 @@ class ReportGenerationAgent:
             table {{ border-collapse: collapse; width: 100%; margin: 14px 0 22px; }} th {{ background: {self.NAVY}; color: white; text-align: left; }} th, td {{ border: 1px solid {self.LINE}; padding: 9px; }}
             figure {{ margin: 18px 0 24px; page-break-inside: avoid; }} img {{ max-width: 100%; border: 1px solid {self.LINE}; }} figcaption {{ font-weight: bold; margin-top: 6px; color: #253244; }}
         </style></head><body><div class="page">
-            <section class="cover"><h1>{self._esc(institution)}</h1><h2>Med-Sec Audit Agent Security Audit Report</h2>
+            <section class="cover">
+                <h1>{self._esc(institution)}</h1>
+                <h2>Med-Sec Audit Agent Security & Compliance Audit Report</h2>
+                <p style="font-size:12px; color:#8899AA;">(Med-Sec Audit Agent: AI-Powered Healthcare Clinical Data Security & Compliance Auditor)</p>
+                <div class="tagline">DATA SECURITY IS NOT A FEATURE — IT IS A NECESSITY.<br/>AND NOW, IT IS AUTOMATED.</div>
+                <p style="font-size:11px; color:#BDE7E3;">TARGET SYSTEM: Healthcare Clinical Data Documentation System (EHR)</p>
                 <div class="meta-grid">
                     <div class="meta"><strong>Report Date</strong><br>{self._esc(report_date)}</div>
-                    <div class="meta"><strong>Target System</strong><br>{self._esc(target)}</div>
+                    <div class="meta"><strong>Target System</strong><br>Healthcare Clinical Data Documentation System (EHR)</div>
                     <div class="meta"><strong>Audit ID</strong><br>{self._esc(data.get('audit_id', 'N/A'))}</div>
                     <div class="meta"><strong>Generated By</strong><br>{self._esc(context.get('prepared_by', 'Med-Sec Audit Agent'))}</div>
                 </div>
