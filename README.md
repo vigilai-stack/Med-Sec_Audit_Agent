@@ -754,7 +754,8 @@ kaggle_submission/
 | **GitHub** | [https://github.com/vigilai-stack](https://github.com/vigilai-stack) |
 | **Repository** | [vigilai-stack/Med-Sec_Audit_Agent](https://github.com/vigilai-stack/Med-Sec_Audit_Agent) |
 | **Live Demo** | [Streamlit Dashboard via Ngrok](https://upside-dumpster-jellied.ngrok-free.dev/?ngrok-skip-browser-warning=true) |
-
+| **Live Dashboard** | [https://phiguardians.manus.space] deployed on Manus AI-development Platform |
+| **Youtube Link** | [https://youtu.be/sLirrEqtDbo] |
 ---
 
 > **"Data security is not a feature — it's a necessity. And now, it's automated."**
