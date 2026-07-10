@@ -11,7 +11,7 @@
 | **Track** | Agents for Good – Kaggle AI Agents: Intensive Vibe Coding Capstone Project |
 | **Team** | PHI Guardians |
 | **Members** | Sangeeta Sinha & Chittranjan Garg |
-| **Submission Date** | 07 July 2026 |
+| **Submission Date** | 06 July 2026 |
 | **GitHub** | [vigilai-stack/Med-Sec_Audit_Agent](https://github.com/vigilai-stack/Med-Sec_Audit_Agent) |
 | **Live Demo** | [Streamlit Dashboard via Ngrok](https://upside-dumpster-jellied.ngrok-free.dev/?ngrok-skip-browser-warning=true) |
 
